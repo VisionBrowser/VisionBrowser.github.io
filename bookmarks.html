@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Bookmarks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --vision-purple: #8b5cf6;
+            --vision-bg: #0f0f10;
+            --vision-surface: #1c1c1e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--vision-bg);
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            scrollbar-width: none;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            display: none;
+        }
+
+        .header-tools {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: white;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--vision-purple);
+        }
+
+        .add-btn {
+            background: var(--vision-purple);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: transform 0.2s;
+        }
+
+        .add-btn:active {
+            transform: scale(0.95);
+        }
+
+        .bookmark-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            margin-bottom: 8px;
+        }
+
+        .bookmark-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .bookmark-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(139, 92, 246, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--vision-purple);
+        }
+
+        .bookmark-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .bookmark-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .bookmark-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bookmark-url {
+            font-size: 11px;
+            color: #71717a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .delete-btn {
+            opacity: 0;
+            color: #ef4444;
+            padding: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .bookmark-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal {
+            background: #1c1c1e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #71717a;
+            margin-bottom: 6px;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .btn-cancel {
+            background: rgba(255,255,255,0.05);
+            color: #71717a;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60vh;
+            color: #3f3f46;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-area">
+        <div class="header-tools">
+            <input type="text" id="search-input" class="search-input" placeholder="Search bookmarks...">
+            <button id="show-modal-btn" class="add-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        </div>
+
+        <div id="bookmarks-list">
+            <!-- Items injected via JS -->
+        </div>
+
+        <div id="empty-state" class="empty-state hidden">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-20"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+            <p class="text-xs font-bold uppercase tracking-widest opacity-30">No bookmarks yet</p>
+        </div>
+    </div>
+
+    <!-- Modal for adding bookmark -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-purple-400 mb-6">New Bookmark</h2>
+            <div class="input-group">
+                <label>Title</label>
+                <input type="text" id="bm-title" class="modal-input" placeholder="Visionary Site">
+            </div>
+            <div class="input-group">
+                <label>URL</label>
+                <input type="text" id="bm-url" class="modal-input" placeholder="example.com">
+            </div>
+            <div class="modal-actions">
+                <button id="cancel-btn" class="modal-btn btn-cancel">Cancel</button>
+                <button id="save-btn" class="modal-btn bg-purple-600 text-white">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const showModalBtn = document.getElementById('show-modal-btn');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const bookmarksList = document.getElementById('bookmarks-list');
+        const emptyState = document.getElementById('empty-state');
+        const bmTitleInput = document.getElementById('bm-title');
+        const bmUrlInput = document.getElementById('bm-url');
+
+        let bookmarks = [];
+
+        function loadBookmarks() {
+            const saved = localStorage.getItem('vision_bookmarks');
+            if (saved) {
+                try {
+                    bookmarks = JSON.parse(saved);
+                } catch (e) { bookmarks = []; }
+            } else {
+                // Default bookmarks
+                bookmarks = [
+                    { id: '1', title: 'Google', url: 'https://google.com' },
+                    { id: '2', title: 'GitHub', url: 'https://github.com' },
+                    { id: '3', title: 'YouTube', url: 'https://youtube.com' }
+                ];
+                saveBookmarks();
+            }
+            render();
+        }
+
+        function saveBookmarks() {
+            localStorage.setItem('vision_bookmarks', JSON.stringify(bookmarks));
+        }
+
+        function render() {
+            bookmarksList.innerHTML = '';
+            const filter = searchInput.value.toLowerCase();
+            const filtered = bookmarks.filter(b => 
+                b.title.toLowerCase().includes(filter) || 
+                b.url.toLowerCase().includes(filter)
+            );
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                filtered.forEach(bm => {
+                    const card = document.createElement('div');
+                    card.className = 'bookmark-card';
+                    card.innerHTML = `
+                        <div class="bookmark-icon">${bm.title.charAt(0).toUpperCase()}</div>
+                        <div class="bookmark-info">
+                            <div class="bookmark-title">${bm.title}</div>
+                            <div class="bookmark-url">${bm.url}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteBookmark('${bm.id}', event)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    `;
+                    card.onclick = () => {
+                        window.parent.postMessage({ type: 'navigate', query: bm.url }, '*');
+                    };
+                    bookmarksList.appendChild(card);
+                });
+            }
+        }
+
+        function deleteBookmark(id, e) {
+            e.stopPropagation();
+            bookmarks = bookmarks.filter(b => b.id !== id);
+            saveBookmarks();
+            render();
+        }
+
+        showModalBtn.onclick = () => {
+            modalOverlay.style.display = 'flex';
+            bmTitleInput.focus();
+        };
+
+        cancelBtn.onclick = () => {
+            modalOverlay.style.display = 'none';
+            bmTitleInput.value = '';
+            bmUrlInput.value = '';
+        };
+
+        saveBtn.onclick = () => {
+            const title = bmTitleInput.value.trim();
+            let url = bmUrlInput.value.trim();
+            if (!title || !url) return;
+
+            if (!url.startsWith('http')) url = 'https://' + url;
+
+            bookmarks.push({
+                id: Math.random().toString(36).substr(2, 9),
+                title,
+                url
+            });
+            saveBookmarks();
+            render();
+            cancelBtn.onclick();
+        };
+
+        searchInput.oninput = render;
+
+        loadBookmarks();
+    </script>
+</body>
+</html>
