@@ -531,7 +531,7 @@
             const currentSrc = sidePanelIframe.getAttribute('src');
             const isOpen = sidePanel.classList.contains('open');
 
-            if (isOpen && currentSrc === src) {
+            if (isOpen && currentSrc.includes(src)) {
                 sidePanel.classList.remove('open');
             } else {
                 sidePanelTitle.textContent = `Vision ${title}`;
@@ -603,6 +603,14 @@
             if (event.data && event.data.type === 'navigate') navigate(event.data.query);
             if (event.data && event.data.type === 'metadata') {
                 updateTab(activeTabId, { title: event.data.title, favicon: event.data.favicon });
+            }
+            if (event.data && event.data.type === 'request-current-tab') {
+                const tab = tabs.find(t => t.id === activeTabId);
+                event.source.postMessage({
+                    type: 'response-current-tab',
+                    url: tab.url,
+                    title: tab.title
+                }, '*');
             }
         });
 
