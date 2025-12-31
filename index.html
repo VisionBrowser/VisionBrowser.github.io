@@ -165,40 +165,6 @@
             margin: 6px 8px;
         }
 
-        /* Zoom Control in Menu */
-        .zoom-menu-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 14px;
-            margin-bottom: 4px;
-        }
-        
-        .zoom-pill {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 2px;
-            flex: 1;
-        }
-
-        .zoom-btn {
-            flex: 1;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            transition: all 0.2s;
-            color: var(--text-dim);
-        }
-
-        .zoom-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
         /* Side Panel - Rounded */
         #side-panel {
             position: fixed;
@@ -271,7 +237,7 @@
                 <button class="tool-btn" title="Security"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></button>
                 <button class="tool-btn" title="Notifications"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
                 <button id="music-trigger" class="tool-btn" title="Music"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></button>
-                <button id="apps-btn" class="tool-btn" title="Vision Apps"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+                <button id="settings-trigger" class="tool-btn" title="Vision Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
                 <button id="games-btn" class="tool-btn" title="Vision Games"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="13" r="1"/><circle cx="18" cy="11" r="1"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg></button>
                 <button class="tool-btn" title="Cloud Sync"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19c2.5 0 4.5-2 4.5-4.5 0-2.3-1.7-4.2-4-4.5A7 7 0 1 0 5 13.7c-1.7.5-3 2.1-3 3.8 0 2.5 2 4.5 4.5 4.5h11z"/></svg></button>
             </div>
@@ -313,9 +279,9 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
                 Developer Tools
             </div>
-            <div class="menu-item" onclick="navigate('apps.html')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Vision Apps
+            <div class="menu-item" onclick="toggleSidePanel('Settings', 'settings.html')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Vision Settings
             </div>
             <div class="menu-item" onclick="navigate('games.html')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="13" r="1"/><circle cx="18" cy="11" r="1"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>
@@ -371,12 +337,13 @@
         const sidePanelTitle = document.getElementById('side-panel-title');
         const sidePanelIframe = document.getElementById('side-panel-iframe');
         const closeSidePanel = document.getElementById('close-side-panel');
-        const appsBtn = document.getElementById('apps-btn');
+        const settingsTrigger = document.getElementById('settings-trigger');
         const gamesBtn = document.getElementById('games-btn');
 
         function saveSession() {
+            // Save tab structure but not the URLs (per user request to start at homepage)
             const session = {
-                tabs: tabs.map(t => ({...t, favicon: t.favicon})),
+                tabs: tabs.map(t => ({ id: t.id, title: 'New Tab', zoom: t.zoom })),
                 activeTabId: activeTabId
             };
             localStorage.setItem('vision_session', JSON.stringify(session));
@@ -388,7 +355,13 @@
                 try {
                     const session = JSON.parse(saved);
                     if (session.tabs && session.tabs.length > 0) {
-                        tabs = session.tabs;
+                        // Restore tab count but force URLs to homepage
+                        tabs = session.tabs.map(t => ({
+                            ...t,
+                            url: '',
+                            proxyUrl: 'newtab.html',
+                            favicon: null
+                        }));
                         render();
                         if (session.activeTabId) setActiveTab(session.activeTabId);
                         return true;
@@ -418,7 +391,7 @@
         function formatUrl(input) {
             input = input.trim();
             if (!input) return 'newtab.html';
-            const isLocal = ['apps.html', 'games.html', 'history.html', 'bookmarks.html', 'newtab.html', 'devtools.html'].includes(input);
+            const isLocal = ['apps.html', 'games.html', 'history.html', 'bookmarks.html', 'newtab.html', 'devtools.html', 'settings.html'].includes(input);
             if (isLocal) return input;
 
             const isUrl = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-\.\/?%&=]*)?$/i.test(input);
@@ -427,7 +400,8 @@
                 if (!domain.startsWith('http')) domain = 'https://' + domain;
                 return `/active/embed.html?url=${domain}`;
             } else {
-                return `/active/embed.html?url=https://www.google.com/search?q=${encodeURIComponent(input)}`;
+                const searchBase = localStorage.getItem('vision_search_engine') || 'https://www.google.com/search?q=';
+                return `/active/embed.html?url=${searchBase}${encodeURIComponent(input)}`;
             }
         }
 
@@ -642,7 +616,7 @@
 
         musicTrigger.onclick = (e) => { e.stopPropagation(); toggleSidePanel('Music', 'music.html'); };
         closeSidePanel.onclick = () => { sidePanel.classList.remove('open'); };
-        appsBtn.onclick = () => navigate('apps.html');
+        settingsTrigger.onclick = (e) => { e.stopPropagation(); toggleSidePanel('Settings', 'settings.html'); };
         gamesBtn.onclick = () => navigate('games.html');
 
         if (!loadSession()) {
