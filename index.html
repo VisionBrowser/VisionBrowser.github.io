@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +14,7 @@
             --text-main: #ffffff;
             --text-dim: #a1a1aa;
             --accent-purple: #8b5cf6;
+            --capsule-bg: rgba(255, 255, 255, 0.05);
         }
 
         body {
@@ -26,7 +26,7 @@
             user-select: none;
         }
 
-        /* Tab Rounding with mask-image */
+        /* Tab Styling */
         .tab {
             position: relative;
             height: 38px;
@@ -61,7 +61,6 @@
             box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* Inverted corners using mask-image for that authentic browser feel */
         .tab.active::before {
             content: '';
             position: absolute;
@@ -86,8 +85,150 @@
             mask-image: radial-gradient(circle at 100% 0, transparent 10px, black 10px);
         }
 
-        .no-scrollbar::-webkit-scrollbar {
+        /* Toolbar Groups */
+        .tool-capsule {
+            background: var(--capsule-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            gap: 2px;
+        }
+
+        .tool-btn {
+            padding: 8px;
+            border-radius: 12px;
+            color: var(--text-dim);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Address Bar */
+        #address-bar-wrapper {
+            background: #0f0f10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+
+        #address-bar-wrapper:focus-within {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2), inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Dropdown Menu */
+        #menu-dropdown {
+            position: absolute;
+            top: 56px;
+            right: 16px;
+            width: 240px;
+            background: #1c1c1e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             display: none;
+            flex-direction: column;
+            padding: 8px;
+            z-index: 100;
+        }
+
+        .menu-item {
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.05);
+            margin: 6px 8px;
+        }
+
+        /* Zoom Control in Menu */
+        .zoom-menu-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            margin-bottom: 4px;
+        }
+        
+        .zoom-pill {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 2px;
+            flex: 1;
+        }
+
+        .zoom-btn {
+            flex: 1;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+            color: var(--text-dim);
+        }
+
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Side Panel - Rounded */
+        #side-panel {
+            position: fixed;
+            top: 72px; /* Adjusted to look more attached to toolbar bottom */
+            right: 0;
+            bottom: 32px;
+            width: 350px;
+            background: #1c1c1e;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-top-left-radius: 24px;
+            border-bottom-left-radius: 24px;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 50;
+            box-shadow: -15px 0 45px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #side-panel.open {
+            transform: translateX(0);
+        }
+
+        /* Zoom Scaling */
+        .zoom-container {
+            width: 100%;
+            height: 100%;
+            transform-origin: 0 0;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         iframe {
@@ -95,75 +236,108 @@
             height: 100%;
             border: none;
             background: white;
-            border-radius: 0;
         }
 
-        #viewport-container {
-            background-color: #000;
-        }
-
-        /* Custom UI Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        
-        .address-bar-container {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        input:focus {
-            box-shadow: 0 0 0 1px var(--accent-purple);
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="h-screen flex flex-col">
 
-    <!-- Tab Strip -->
     <div id="tab-strip" class="flex items-end px-4 pt-3 h-14 gap-1 overflow-x-auto no-scrollbar bg-[var(--bg-main)]">
-        <!-- Tabs injected here -->
         <button id="add-tab-btn" class="mb-2 p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
     </div>
 
-    <!-- Toolbar -->
-    <div class="h-12 bg-[var(--bg-toolbar)] px-4 flex items-center gap-4 address-bar-container z-20 shadow-lg">
+    <div class="h-16 bg-[var(--bg-toolbar)] px-4 flex items-center gap-4 border-b border-white/5 z-20 shadow-lg relative">
         <div class="flex items-center gap-1 text-gray-400">
-            <button id="back-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-            <button id="forward-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
-            <button id="refresh-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button>
+            <button id="back-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <button id="forward-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+            <button id="refresh-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all ml-1"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button>
         </div>
 
-        <div class="flex-1 relative group flex items-center gap-2">
-            <div class="relative flex-1">
-                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <div class="flex-1 flex items-center h-full">
+            <div id="address-bar-wrapper" class="w-full flex items-center h-9 px-4 rounded-full group">
+                <div class="text-gray-500 group-focus-within:text-purple-400 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
                 <input id="address-bar" type="text" autocomplete="off" placeholder="Search or enter address" 
-                    class="w-full h-8 bg-[#0f0f10] rounded-full pl-10 pr-4 text-xs font-semibold text-white focus:outline-none transition-all placeholder-gray-600 border border-white/5">
+                    class="bg-transparent border-none outline-none w-full text-sm font-semibold text-white placeholder-gray-600">
             </div>
-            
-            <!-- 3-Dot Menu Button -->
-            <button id="menu-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all text-gray-400 flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="1"></circle>
-                    <circle cx="12" cy="5" r="1"></circle>
-                    <circle cx="12" cy="19" r="1"></circle>
-                </svg>
-            </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div class="tool-capsule">
+                <button class="tool-btn" title="Security"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></button>
+                <button class="tool-btn" title="Notifications"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+                <button id="music-trigger" class="tool-btn" title="Music"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></button>
+                <button id="apps-btn" class="tool-btn" title="Vision Apps"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+                <button id="games-btn" class="tool-btn" title="Vision Games"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="13" r="1"/><circle cx="18" cy="11" r="1"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg></button>
+                <button class="tool-btn" title="Cloud Sync"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19c2.5 0 4.5-2 4.5-4.5 0-2.3-1.7-4.2-4-4.5A7 7 0 1 0 5 13.7c-1.7.5-3 2.1-3 3.8 0 2.5 2 4.5 4.5 4.5h11z"/></svg></button>
+            </div>
+
+            <div class="tool-capsule">
+                <button class="tool-btn" title="Dashboard"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
+                <button id="menu-btn" class="tool-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+            </div>
+        </div>
+
+        <div id="menu-dropdown">
+            <div class="zoom-menu-row">
+                <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Zoom</span>
+                <div class="zoom-pill">
+                    <button id="zoom-out-btn" class="zoom-btn" title="Zoom Out">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                    <button id="zoom-reset-btn" class="flex-1 text-[11px] font-bold text-center px-2 hover:text-purple-400 transition-colors" title="Reset Zoom">
+                        <span id="menu-zoom-val">100%</span>
+                    </button>
+                    <button id="zoom-in-btn" class="zoom-btn" title="Zoom In">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <div class="menu-item" onclick="navigate('history.html')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                History
+            </div>
+            <div class="menu-item" onclick="navigate('bookmarks.html')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                Bookmarks
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" onclick="navigate('devtools.html')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Developer Tools
+            </div>
+            <div class="menu-item" onclick="navigate('apps.html')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Vision Apps
+            </div>
+            <div class="menu-item" onclick="navigate('games.html')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="13" r="1"/><circle cx="18" cy="11" r="1"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>
+                Vision Games
+            </div>
         </div>
     </div>
 
-    <!-- Viewport Container -->
-    <div id="viewport-container" class="flex-1 relative overflow-hidden">
-        <!-- Iframes injected here -->
+    <div id="side-panel">
+        <div class="flex items-center justify-between p-5 border-b border-white/10 shrink-0 bg-[#1c1c1e]/50 backdrop-blur-md">
+            <h2 class="font-bold text-xs tracking-[0.2em] uppercase text-purple-400">Vision Music</h2>
+            <button id="close-side-panel" class="p-2 hover:bg-white/10 rounded-full transition-all text-gray-400 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-hidden">
+            <iframe src="music.html" class="w-full h-full"></iframe>
+        </div>
     </div>
 
-    <!-- Status Bar -->
+    <div id="viewport-container" class="flex-1 relative overflow-hidden bg-black"></div>
+
     <div class="h-8 bg-[#121214] text-gray-500 px-5 flex items-center justify-between text-[10px] border-t border-white/5 z-30 font-bold uppercase tracking-widest">
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
@@ -171,12 +345,12 @@
                 <span>Vision Online</span>
             </div>
             <div id="status-url" class="truncate max-w-sm lowercase font-medium opacity-60 italic">Ready</div>
+            <div id="zoom-indicator" class="opacity-50">100%</div>
         </div>
         <div id="current-datetime"></div>
     </div>
 
     <script>
-        // State Management
         let tabs = [];
         let activeTabId = null;
 
@@ -185,20 +359,70 @@
         const addressBar = document.getElementById('address-bar');
         const currentDatetimeEl = document.getElementById('current-datetime');
         const statusUrlEl = document.getElementById('status-url');
+        const zoomIndicator = document.getElementById('zoom-indicator');
         const menuBtn = document.getElementById('menu-btn');
+        const menuDropdown = document.getElementById('menu-dropdown');
+        const zoomInBtn = document.getElementById('zoom-in-btn');
+        const zoomOutBtn = document.getElementById('zoom-out-btn');
+        const zoomResetBtn = document.getElementById('zoom-reset-btn');
+        const menuZoomVal = document.getElementById('menu-zoom-val');
+        const musicTrigger = document.getElementById('music-trigger');
+        const sidePanel = document.getElementById('side-panel');
+        const closeSidePanel = document.getElementById('close-side-panel');
+        const appsBtn = document.getElementById('apps-btn');
+        const gamesBtn = document.getElementById('games-btn');
+
+        function saveSession() {
+            const session = {
+                tabs: tabs.map(t => ({...t, favicon: t.favicon})),
+                activeTabId: activeTabId
+            };
+            localStorage.setItem('vision_session', JSON.stringify(session));
+        }
+
+        function loadSession() {
+            const saved = localStorage.getItem('vision_session');
+            if (saved) {
+                try {
+                    const session = JSON.parse(saved);
+                    if (session.tabs && session.tabs.length > 0) {
+                        tabs = session.tabs;
+                        render();
+                        if (session.activeTabId) setActiveTab(session.activeTabId);
+                        return true;
+                    }
+                } catch (e) { console.error("Session load failed", e); }
+            }
+            return false;
+        }
+
+        function recordHistory(url, title, favicon = null) {
+            if (!url || url === 'newtab.html' || url.includes('history.html')) return;
+            const history = JSON.parse(localStorage.getItem('vision_history') || '[]');
+            
+            if (history.length > 0 && history[0].url === url && (new Date().getTime() - history[0].time < 2000)) return;
+
+            const entry = {
+                url,
+                title: title || url,
+                favicon: favicon,
+                time: new Date().getTime(),
+                id: Math.random().toString(36).substr(2, 9)
+            };
+            history.unshift(entry);
+            localStorage.setItem('vision_history', JSON.stringify(history.slice(0, 500)));
+        }
 
         function formatUrl(input) {
             input = input.trim();
             if (!input) return 'newtab.html';
+            const isLocal = ['apps.html', 'games.html', 'history.html', 'bookmarks.html', 'newtab.html', 'devtools.html'].includes(input);
+            if (isLocal) return input;
 
-            // Simple URL regex
             const isUrl = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-\.\/?%&=]*)?$/i.test(input);
-
             if (isUrl) {
                 let domain = input;
-                if (!domain.startsWith('http')) {
-                    domain = 'https://' + domain;
-                }
+                if (!domain.startsWith('http')) domain = 'https://' + domain;
                 return `/active/embed.html?url=${domain}`;
             } else {
                 return `/active/embed.html?url=https://www.google.com/search?q=${encodeURIComponent(input)}`;
@@ -212,28 +436,30 @@
                 title,
                 url: (url === 'newtab.html' || url === 'about:blank') ? '' : url,
                 proxyUrl: url,
-                favicon: null
+                favicon: null,
+                zoom: 1
             };
             tabs.push(tab);
             setActiveTab(id);
+            if (url !== 'newtab.html') recordHistory(url, title);
             render();
+            saveSession();
         }
 
         function closeTab(id, e) {
             if (e) e.stopPropagation();
             if (tabs.length === 1) {
-                updateTab(id, { url: '', proxyUrl: 'newtab.html', title: 'New Tab' });
+                updateTab(id, { url: '', proxyUrl: 'newtab.html', title: 'New Tab', zoom: 1, favicon: null });
                 return;
             }
-
             const index = tabs.findIndex(t => t.id === id);
             tabs = tabs.filter(t => t.id !== id);
-
             if (activeTabId === id) {
                 const nextTab = tabs[index] || tabs[index - 1];
                 setActiveTab(nextTab.id);
             }
             render();
+            saveSession();
         }
 
         function setActiveTab(id) {
@@ -242,19 +468,41 @@
             if (tab) {
                 addressBar.value = tab.url;
                 statusUrlEl.textContent = tab.url || 'Vision Home';
+                const zText = Math.round(tab.zoom * 100) + '%';
+                zoomIndicator.textContent = zText;
+                menuZoomVal.textContent = zText;
             }
             render();
+            saveSession();
         }
 
         function updateTab(id, updates) {
             const tab = tabs.find(t => t.id === id);
             if (tab) {
                 Object.assign(tab, updates);
+                
+                if (updates.title || updates.favicon) {
+                    const history = JSON.parse(localStorage.getItem('vision_history') || '[]');
+                    let historyChanged = false;
+                    for(let entry of history) {
+                        if (entry.url === tab.url) {
+                            if (updates.title) entry.title = updates.title;
+                            if (updates.favicon) entry.favicon = updates.favicon;
+                            historyChanged = true;
+                        }
+                    }
+                    if (historyChanged) localStorage.setItem('vision_history', JSON.stringify(history));
+                }
+
                 if (id === activeTabId) {
                     addressBar.value = tab.url;
                     statusUrlEl.textContent = tab.url || tab.title;
+                    const zText = Math.round(tab.zoom * 100) + '%';
+                    zoomIndicator.textContent = zText;
+                    menuZoomVal.textContent = zText;
                 }
                 render();
+                saveSession();
             }
         }
 
@@ -263,8 +511,18 @@
             updateTab(activeTabId, {
                 url: input,
                 proxyUrl: proxyUrl,
-                title: input
+                title: input,
+                favicon: null
             });
+            recordHistory(input, input);
+            menuDropdown.style.display = 'none';
+        }
+
+        function adjustZoom(delta) {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (!tab) return;
+            tab.zoom = Math.max(0.5, Math.min(2.0, tab.zoom + delta));
+            updateTab(tab.id, { zoom: tab.zoom });
         }
 
         function render() {
@@ -278,41 +536,42 @@
                 tabEl.className = `tab ${isActive ? 'active' : 'inactive'}`;
                 tabEl.innerHTML = `
                     <div class="flex items-center gap-2.5 flex-1 min-w-0 pointer-events-none">
-                        ${tab.favicon ? `<img src="${tab.favicon}" class="w-4 h-4 rounded-sm">` : `<div class="w-4 h-4 bg-purple-500/20 rounded-sm border border-purple-500/30"></div>`}
-                        <span class="truncate">${tab.title || 'New Tab'}</span>
+                        ${tab.favicon ? `<img src="${tab.favicon}" class="w-4 h-4 rounded-sm object-cover" onerror="this.style.display='none'">` : `<div class="w-4 h-4 bg-purple-500/20 rounded-sm border border-purple-500/30"></div>`}
+                        <span class="truncate text-xs">${tab.title || 'New Tab'}</span>
                     </div>
                     <button class="close-btn p-1 rounded-md hover:bg-white/10 opacity-40 hover:opacity-100 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 `;
-
                 tabEl.onclick = () => setActiveTab(tab.id);
                 tabEl.querySelector('.close-btn').onclick = (e) => closeTab(tab.id, e);
                 tabStrip.insertBefore(tabEl, addBtn);
             });
 
             const viewports = viewportContainer.querySelectorAll('.viewport');
-            viewports.forEach(vp => {
-                if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove();
-            });
+            viewports.forEach(vp => { if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove(); });
 
             tabs.forEach(tab => {
                 let vp = viewportContainer.querySelector(`.viewport[data-id="${tab.id}"]`);
                 if (!vp) {
                     vp = document.createElement('div');
-                    vp.className = 'viewport absolute inset-0 transition-opacity duration-300';
+                    vp.className = 'viewport absolute inset-0 overflow-hidden';
                     vp.dataset.id = tab.id;
+                    vp.innerHTML = `<div class="zoom-container"><iframe src="${tab.proxyUrl}"></iframe></div>`;
                     viewportContainer.appendChild(vp);
                 }
-
                 const isActive = tab.id === activeTabId;
                 vp.style.opacity = isActive ? '1' : '0';
                 vp.style.zIndex = isActive ? '10' : '1';
                 vp.style.pointerEvents = isActive ? 'auto' : 'none';
-
+                const zoomContainer = vp.querySelector('.zoom-container');
+                zoomContainer.style.transform = `scale(${tab.zoom})`;
+                zoomContainer.style.width = (100 / tab.zoom) + '%';
+                zoomContainer.style.height = (100 / tab.zoom) + '%';
+                const iframe = zoomContainer.querySelector('iframe');
                 if (vp.dataset.url !== tab.proxyUrl) {
                     vp.dataset.url = tab.proxyUrl;
-                    vp.innerHTML = `<iframe src="${tab.proxyUrl}"></iframe>`;
+                    iframe.src = tab.proxyUrl;
                 }
             });
         }
@@ -324,23 +583,15 @@
             currentDatetimeEl.textContent = `${timeStr} — ${dateStr}`;
         }
 
-        // Parent listener for communication from newtab.html
         window.addEventListener('message', (event) => {
-            if (event.data && event.data.type === 'navigate') {
-                navigate(event.data.query);
-            }
+            if (event.data && event.data.type === 'navigate') navigate(event.data.query);
             if (event.data && event.data.type === 'metadata') {
-                updateTab(activeTabId, {
-                    title: event.data.title,
-                    favicon: event.data.favicon
-                });
+                updateTab(activeTabId, { title: event.data.title, favicon: event.data.favicon });
             }
         });
 
         document.getElementById('add-tab-btn').onclick = () => createTab();
-        addressBar.onkeydown = (e) => {
-            if (e.key === 'Enter') navigate(addressBar.value);
-        };
+        addressBar.onkeydown = (e) => { if (e.key === 'Enter') navigate(addressBar.value); };
         document.getElementById('refresh-btn').onclick = () => {
             const tab = tabs.find(t => t.id === activeTabId);
             if (tab) {
@@ -350,12 +601,29 @@
             }
         };
 
-        // 3-dot menu placeholder logic
-        menuBtn.onclick = () => {
-            console.log("Menu clicked - logic to be implemented later.");
+        menuBtn.onclick = (e) => { 
+            e.stopPropagation(); 
+            menuDropdown.style.display = menuDropdown.style.display === 'flex' ? 'none' : 'flex'; 
         };
 
-        createTab();
+        document.addEventListener('click', (e) => {
+            if (!menuDropdown.contains(e.target) && e.target !== menuBtn) {
+                menuDropdown.style.display = 'none'; 
+            }
+        });
+
+        zoomInBtn.onclick = (e) => { e.stopPropagation(); adjustZoom(0.1); };
+        zoomOutBtn.onclick = (e) => { e.stopPropagation(); adjustZoom(-0.1); };
+        zoomResetBtn.onclick = (e) => { e.stopPropagation(); updateTab(activeTabId, { zoom: 1 }); };
+
+        musicTrigger.onclick = (e) => { e.stopPropagation(); sidePanel.classList.toggle('open'); };
+        closeSidePanel.onclick = () => { sidePanel.classList.remove('open'); };
+        appsBtn.onclick = () => navigate('apps.html');
+        gamesBtn.onclick = () => navigate('games.html');
+
+        if (!loadSession()) {
+            createTab();
+        }
         setInterval(updateClock, 1000);
         updateClock();
     </script>
