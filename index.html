@@ -202,7 +202,7 @@
         /* Side Panel - Rounded */
         #side-panel {
             position: fixed;
-            top: 72px; /* Adjusted to look more attached to toolbar bottom */
+            top: 72px; 
             right: 0;
             bottom: 32px;
             width: 350px;
@@ -304,7 +304,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 History
             </div>
-            <div class="menu-item" onclick="navigate('bookmarks.html')">
+            <div class="menu-item" onclick="toggleSidePanel('Bookmarks', 'bookmarks.html')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
                 Bookmarks
             </div>
@@ -326,13 +326,13 @@
 
     <div id="side-panel">
         <div class="flex items-center justify-between p-5 border-b border-white/10 shrink-0 bg-[#1c1c1e]/50 backdrop-blur-md">
-            <h2 class="font-bold text-xs tracking-[0.2em] uppercase text-purple-400">Vision Music</h2>
+            <h2 id="side-panel-title" class="font-bold text-xs tracking-[0.2em] uppercase text-purple-400">Vision Music</h2>
             <button id="close-side-panel" class="p-2 hover:bg-white/10 rounded-full transition-all text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         <div class="flex-1 overflow-hidden">
-            <iframe src="music.html" class="w-full h-full"></iframe>
+            <iframe id="side-panel-iframe" src="music.html" class="w-full h-full"></iframe>
         </div>
     </div>
 
@@ -368,6 +368,8 @@
         const menuZoomVal = document.getElementById('menu-zoom-val');
         const musicTrigger = document.getElementById('music-trigger');
         const sidePanel = document.getElementById('side-panel');
+        const sidePanelTitle = document.getElementById('side-panel-title');
+        const sidePanelIframe = document.getElementById('side-panel-iframe');
         const closeSidePanel = document.getElementById('close-side-panel');
         const appsBtn = document.getElementById('apps-btn');
         const gamesBtn = document.getElementById('games-btn');
@@ -525,6 +527,20 @@
             updateTab(tab.id, { zoom: tab.zoom });
         }
 
+        function toggleSidePanel(title, src) {
+            const currentSrc = sidePanelIframe.getAttribute('src');
+            const isOpen = sidePanel.classList.contains('open');
+
+            if (isOpen && currentSrc === src) {
+                sidePanel.classList.remove('open');
+            } else {
+                sidePanelTitle.textContent = `Vision ${title}`;
+                sidePanelIframe.src = src;
+                sidePanel.classList.add('open');
+            }
+            menuDropdown.style.display = 'none';
+        }
+
         function render() {
             const addBtn = document.getElementById('add-tab-btn');
             const existingTabs = tabStrip.querySelectorAll('.tab');
@@ -616,7 +632,7 @@
         zoomOutBtn.onclick = (e) => { e.stopPropagation(); adjustZoom(-0.1); };
         zoomResetBtn.onclick = (e) => { e.stopPropagation(); updateTab(activeTabId, { zoom: 1 }); };
 
-        musicTrigger.onclick = (e) => { e.stopPropagation(); sidePanel.classList.toggle('open'); };
+        musicTrigger.onclick = (e) => { e.stopPropagation(); toggleSidePanel('Music', 'music.html'); };
         closeSidePanel.onclick = () => { sidePanel.classList.remove('open'); };
         appsBtn.onclick = () => navigate('apps.html');
         gamesBtn.onclick = () => navigate('games.html');
