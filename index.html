@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VisionBrowser</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-main: #000000;
@@ -28,36 +28,27 @@
             user-select: none;
         }
 
-        /* Tab Styling - Solid black as requested */
+        /* Tab Styling */
         .tab {
             position: relative;
             height: 42px;
-            min-width: 160px;
-            max-width: 240px;
+            min-width: 140px;
+            max-width: 220px;
             padding: 0 16px;
             display: flex;
             align-items: center;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
             z-index: 1;
             border: 1px solid rgba(255,255,255,0.05);
             border-bottom: none;
-            margin-right: -1px;
-        }
-
-        .tab.inactive {
+            margin-right: 4px;
             background: var(--bg-tab-inactive);
             color: var(--text-dim);
-            opacity: 0.7;
-        }
-
-        .tab.inactive:hover {
-            opacity: 1;
-            background: #080808;
         }
 
         .tab.active {
@@ -65,135 +56,82 @@
             color: var(--text-main);
             z-index: 10;
             border-top: 2px solid var(--accent-purple);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            border-right: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
         }
 
-        /* Toolbar */
-        #main-toolbar {
-            background: var(--bg-toolbar);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+        .tab .close-btn {
+            margin-left: auto;
+            opacity: 0.4;
+            transition: opacity 0.2s;
         }
 
-        .tool-capsule {
-            background: var(--capsule-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            padding: 4px;
-            gap: 2px;
-        }
-
-        .tool-btn {
-            padding: 8px;
-            border-radius: 12px;
-            color: var(--text-dim);
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tool-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
-        }
+        .tab:hover .close-btn { opacity: 1; }
 
         /* Address Bar */
         #address-bar-wrapper {
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
+            border-radius: 12px;
             transition: all 0.2s ease;
         }
 
         #address-bar-wrapper:focus-within {
             border-color: var(--accent-purple);
             background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
         }
 
-        /* Side Panel */
+        /* Toolbars and Capsules */
+        #main-toolbar { background: var(--bg-toolbar); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tool-capsule { background: var(--capsule-bg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px; display: flex; align-items: center; padding: 2px 4px; gap: 2px; }
+        .tool-btn { padding: 8px; border-radius: 10px; color: var(--text-dim); transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+        .tool-btn:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+
+        /* Side Panel Styling */
         #side-panel {
             position: fixed;
-            top: 72px; 
-            right: 0;
-            bottom: 32px;
+            top: 56px; right: 0; bottom: 32px;
             width: 350px;
             background: rgba(10, 10, 12, 0.98);
             border-left: 1px solid rgba(255, 255, 255, 0.1);
-            border-top-left-radius: 24px;
-            border-bottom-left-radius: 24px;
+            border-top-left-radius: 24px; border-bottom-left-radius: 24px;
             transform: translateX(100%);
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 50;
             box-shadow: -20px 0 60px rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            display: flex; flex-direction: column; overflow: hidden;
             backdrop-filter: blur(30px);
         }
 
-        #side-panel.open {
-            transform: translateX(0);
-        }
+        #side-panel.open { transform: translateX(0); }
 
-        /* Dropdown Menu */
-        #menu-dropdown {
-            position: absolute;
-            top: 56px;
-            right: 16px;
-            width: 240px;
-            background: #0a0a0b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9);
-            display: none;
-            flex-direction: column;
-            padding: 8px;
-            z-index: 100;
-        }
-
-        .menu-item {
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-dim);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: background 0.15s, color 0.15s;
-        }
-
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
-
-        .viewport { background: transparent; }
-        iframe { width: 100%; height: 100%; border: none; background: transparent; }
+        .viewport { background: #000; }
+        iframe { width: 100%; height: 100%; border: none; background: #000; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="h-screen flex flex-col">
-    <div id="tab-strip" class="flex items-end px-4 pt-4 h-14 gap-0 overflow-x-auto no-scrollbar bg-black">
-        <button id="add-tab-btn" class="mb-2 ml-2 p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-500">
+    <!-- Tab Strip -->
+    <div id="tab-strip" class="flex items-end px-4 pt-3 h-14 gap-0 overflow-x-auto no-scrollbar bg-black">
+        <button id="add-tab-btn" class="mb-2 ml-1 p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-500">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
     </div>
 
-    <div id="main-toolbar" class="h-16 px-4 flex items-center gap-4 z-20 shadow-xl relative">
+    <!-- Main Navigation Toolbar -->
+    <div id="main-toolbar" class="h-16 px-4 flex items-center gap-4 z-20 relative">
         <div class="flex items-center gap-1 text-gray-400">
-            <button id="back-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-            <button id="forward-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
-            <button id="refresh-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all ml-1"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button>
+            <button id="back-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <button id="forward-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+            <button id="refresh-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all ml-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button>
         </div>
 
         <div class="flex-1 flex items-center h-full">
             <div id="address-bar-wrapper" class="w-full flex items-center h-10 px-4 group">
                 <div id="address-icon" class="flex items-center text-gray-500 group-focus-within:text-purple-400 mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
                 <input id="address-bar" type="text" autocomplete="off" placeholder="Search or enter address" 
                     class="bg-transparent border-none outline-none w-full text-sm font-semibold text-white placeholder-gray-600">
@@ -202,28 +140,28 @@
 
         <div class="flex items-center gap-3">
             <div class="tool-capsule">
-                <button id="zoom-out-btn" class="tool-btn" title="Zoom Out"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-                <span id="zoom-display" class="zoom-display text-xs font-bold text-gray-400">100%</span>
-                <button id="zoom-in-btn" class="tool-btn" title="Zoom In"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                <button id="zoom-out-btn" class="tool-btn" title="Zoom Out"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                <span id="zoom-display" class="zoom-display text-[11px] font-bold text-gray-500 px-1">100%</span>
+                <button id="zoom-in-btn" class="tool-btn" title="Zoom In"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
             </div>
 
-            <div class="tool-capsule">
-                <button id="music-trigger" class="tool-btn" title="Music"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></button>
+            <div class="flex items-center gap-1">
+                <button id="music-trigger" class="tool-btn" title="Audio"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></button>
                 <button id="settings-trigger" class="tool-btn" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+                <button id="menu-btn" class="tool-btn" title="More"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
             </div>
-
-            <button id="menu-btn" class="tool-btn hover:bg-white/10 p-2 rounded-lg" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
         </div>
 
-        <div id="menu-dropdown">
-            <div class="menu-item" onclick="navigate('history.html')">History</div>
-            <div class="menu-item" onclick="toggleSidePanel('Bookmarks', 'bookmarks.html')">Bookmarks</div>
-            <div class="menu-item" onclick="navigate('devtools.html')">DevTools</div>
+        <div id="menu-dropdown" class="hidden absolute top-[60px] right-4 w-56 bg-[#0a0a0b] border border-white/10 rounded-xl shadow-2xl p-2 z-[100]">
+            <div class="menu-item p-2 hover:bg-white/5 rounded-lg cursor-pointer" onclick="navigate('history.html')">History</div>
+            <div class="menu-item p-2 hover:bg-white/5 rounded-lg cursor-pointer" onclick="toggleSidePanel('Bookmarks', 'bookmarks.html')">Bookmarks</div>
+            <div class="menu-item p-2 hover:bg-white/5 rounded-lg cursor-pointer" onclick="navigate('devtools.html')">DevTools</div>
             <div class="h-[1px] bg-white/5 my-1"></div>
-            <div class="menu-item" onclick="toggleSidePanel('Settings', 'settings.html')">Vision Settings</div>
+            <div class="menu-item p-2 hover:bg-white/5 rounded-lg cursor-pointer" onclick="toggleSidePanel('Settings', 'settings.html')">Vision Settings</div>
         </div>
     </div>
 
+    <!-- Side Panel -->
     <div id="side-panel">
         <div class="flex items-center justify-between p-5 border-b border-white/10 shrink-0 bg-[#0a0a0b]">
             <h2 id="side-panel-title" class="font-black text-[10px] tracking-widest uppercase text-purple-400">Vision Audio</h2>
@@ -236,17 +174,19 @@
         </div>
     </div>
 
-    <div id="viewport-container" class="flex-1 relative overflow-hidden bg-white"></div>
+    <!-- Viewport Container -->
+    <div id="viewport-container" class="flex-1 relative overflow-hidden bg-black"></div>
 
-    <div class="h-8 bg-black text-[9px] font-bold uppercase tracking-[0.2em] text-gray-600 px-5 flex items-center justify-between border-t border-white/5 z-30">
+    <!-- Status Bar -->
+    <div class="h-8 bg-black text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-600 px-5 flex items-center justify-between border-t border-white/5 z-30">
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
                 <div class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div>
-                <span class="text-gray-400">Vision System Active</span>
+                <span class="text-zinc-400">Vision System Active</span>
             </div>
             <div id="status-url" class="truncate max-w-sm lowercase opacity-50 italic">vision://home</div>
         </div>
-        <div id="current-datetime" class="text-gray-500"></div>
+        <div id="current-datetime" class="text-zinc-500"></div>
     </div>
 
     <script>
@@ -335,8 +275,8 @@
 
         function updateAddressIcon(favicon) {
             addressIcon.innerHTML = favicon 
-                ? `<img src="${favicon}" class="w-4 h-4 rounded-sm object-cover">`
-                : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`;
+                ? `<img src="${favicon}" class="w-3.5 h-3.5 rounded-sm object-cover">`
+                : `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`;
         }
 
         function updateTab(id, updates) {
@@ -354,23 +294,45 @@
             }
         }
 
+        function toggleSidePanel(title, src) {
+            if (sidePanel.classList.contains('open') && sidePanelIframe.src.includes(src)) {
+                sidePanel.classList.remove('open');
+            } else {
+                sidePanelTitle.textContent = `Vision ${title}`;
+                sidePanelIframe.src = src;
+                sidePanel.classList.add('open');
+            }
+            menuDropdown.classList.add('hidden');
+        }
+
         function navigate(input) {
             input = input.trim();
             if (!input) return;
-            let proxyUrl = input;
-            const isLocal = ['history.html', 'bookmarks.html', 'newtab.html', 'devtools.html', 'settings.html'].includes(input);
-            if (!isLocal) {
+            
+            let proxyUrl = '';
+            const internalPages = ['history.html', 'bookmarks.html', 'newtab.html', 'devtools.html', 'settings.html', 'music.html'];
+            
+            if (internalPages.includes(input)) {
+                proxyUrl = input;
+            } else {
                 const isUrl = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-\.\/?%&=]*)?$/i.test(input);
+                let finalTarget = '';
+                
                 if (isUrl) {
-                    let domain = input.startsWith('http') ? input : 'https://' + input;
-                    proxyUrl = `/active/embed.html?url=${domain}`;
+                    finalTarget = input;
+                    if (!finalTarget.startsWith('http://') && !finalTarget.startsWith('https://')) {
+                        finalTarget = 'https://' + finalTarget;
+                    }
                 } else {
-                    const searchBase = localStorage.getItem('vision_search_engine') || 'https://duckduckgo.com/?q=';
-                    proxyUrl = `/active/embed.html?url=${searchBase}${encodeURIComponent(input)}`;
+                    finalTarget = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
                 }
+                
+                // Construct the user's custom proxy URL using their /active/embed.html
+                proxyUrl = `active/embed.html?url=${encodeURIComponent(finalTarget)}`;
             }
+            
             updateTab(activeTabId, { url: input, proxyUrl, title: input, favicon: getFavicon(input) });
-            menuDropdown.style.display = 'none';
+            menuDropdown.classList.add('hidden');
         }
 
         function render() {
@@ -382,11 +344,11 @@
                 const tabEl = document.createElement('div');
                 tabEl.className = `tab ${isActive ? 'active' : 'inactive'}`;
                 tabEl.innerHTML = `
-                    <div class="flex items-center gap-2.5 flex-1 min-w-0 pointer-events-none">
+                    <div class="flex items-center gap-2 flex-1 min-w-0 pointer-events-none">
                         ${tab.favicon ? `<img src="${tab.favicon}" class="w-3.5 h-3.5 rounded-sm">` : `<div class="w-3.5 h-3.5 bg-purple-500/20 rounded-sm"></div>`}
                         <span class="truncate text-[11px] font-bold tracking-tight">${tab.title || 'New Tab'}</span>
                     </div>
-                    <button class="close-btn p-1 rounded-md hover:bg-white/10 opacity-30 hover:opacity-100">
+                    <button class="close-btn p-1 rounded-md hover:bg-white/10">
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 `;
@@ -395,7 +357,10 @@
                 tabStrip.insertBefore(tabEl, addBtn);
             });
 
-            viewportContainer.querySelectorAll('.viewport').forEach(vp => { if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove(); });
+            viewportContainer.querySelectorAll('.viewport').forEach(vp => { 
+                if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove(); 
+            });
+
             tabs.forEach(tab => {
                 let vp = viewportContainer.querySelector(`.viewport[data-id="${tab.id}"]`);
                 if (!vp) {
@@ -407,43 +372,37 @@
                 }
                 const isActive = tab.id === activeTabId;
                 vp.style.display = isActive ? 'block' : 'none';
+                
                 const zoomCont = vp.querySelector('.zoom-container');
                 zoomCont.style.transform = `scale(${tab.zoom})`;
                 zoomCont.style.width = (100 / tab.zoom) + '%';
                 zoomCont.style.height = (100 / tab.zoom) + '%';
-                if (vp.querySelector('iframe').src.indexOf(tab.proxyUrl) === -1) vp.querySelector('iframe').src = tab.proxyUrl;
+                
+                const iframe = vp.querySelector('iframe');
+                if (isActive && iframe.getAttribute('src') !== tab.proxyUrl) {
+                    iframe.src = tab.proxyUrl;
+                }
             });
         }
 
-        function toggleSidePanel(title, src) {
-            if (sidePanel.classList.contains('open') && sidePanelIframe.src.includes(src)) {
-                sidePanel.classList.remove('open');
-            } else {
-                sidePanelTitle.textContent = `Vision ${title}`;
-                sidePanelIframe.src = src;
-                sidePanel.classList.add('open');
-            }
-            menuDropdown.style.display = 'none';
-        }
-
-        window.addEventListener('message', (e) => {
-            if (e.data.type === 'navigate') navigate(e.data.query);
-            if (e.data.type === 'metadata') updateTab(activeTabId, { title: e.data.title, favicon: e.data.favicon || getFavicon(tabs.find(t => t.id === activeTabId).url) });
-            if (e.data.type === 'request-current-tab') {
-                const t = tabs.find(t => t.id === activeTabId);
-                e.source.postMessage({ type: 'response-current-tab', url: t.url, title: t.title, favicon: t.favicon }, '*');
-            }
-        });
-
-        document.getElementById('add-tab-btn').onclick = () => createTab();
         addressBar.onkeydown = (e) => { if (e.key === 'Enter') navigate(addressBar.value); };
-        menuBtn.onclick = (e) => { e.stopPropagation(); menuDropdown.style.display = menuDropdown.style.display === 'flex' ? 'none' : 'flex'; };
-        document.onclick = () => menuDropdown.style.display = 'none';
+        menuBtn.onclick = (e) => { e.stopPropagation(); menuDropdown.classList.toggle('hidden'); };
+        document.onclick = () => menuDropdown.classList.add('hidden');
+        document.getElementById('add-tab-btn').onclick = () => createTab();
         document.getElementById('zoom-in-btn').onclick = () => updateTab(activeTabId, { zoom: Math.min(3, tabs.find(t => t.id === activeTabId).zoom + 0.1) });
         document.getElementById('zoom-out-btn').onclick = () => updateTab(activeTabId, { zoom: Math.max(0.25, tabs.find(t => t.id === activeTabId).zoom - 0.1) });
         document.getElementById('music-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Audio', 'music.html'); };
         document.getElementById('settings-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Settings', 'settings.html'); };
         closeSidePanel.onclick = () => sidePanel.classList.remove('open');
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'navigate') navigate(e.data.query);
+            if (e.data.type === 'metadata') updateTab(activeTabId, { title: e.data.title, favicon: e.data.favicon });
+            if (e.data.type === 'request-current-tab') {
+                const tab = tabs.find(t => t.id === activeTabId);
+                e.source.postMessage({ type: 'response-current-tab', url: tab.url, title: tab.title, favicon: tab.favicon }, '*');
+            }
+        });
 
         if (!loadSession()) createTab();
         setInterval(() => {
