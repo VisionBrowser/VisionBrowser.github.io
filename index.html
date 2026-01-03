@@ -315,7 +315,8 @@
             if (internalPages.includes(input)) {
                 proxyUrl = input;
             } else {
-                const isUrl = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-\.\/?%&=]*)?$/i.test(input);
+                // Robust URL detection (looking for dots and no spaces)
+                const isUrl = /^https?:\/\//.test(input) || (/^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(input) && !input.includes(' '));
                 let finalTarget = '';
                 
                 if (isUrl) {
@@ -324,10 +325,11 @@
                         finalTarget = 'https://' + finalTarget;
                     }
                 } else {
+                    // Google search query as requested
                     finalTarget = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
                 }
                 
-                // Construct the user's custom proxy URL using their /active/embed.html
+                // Exclusively using user's /active/embed.html custom method
                 proxyUrl = `active/embed.html?url=${encodeURIComponent(finalTarget)}`;
             }
             
@@ -357,6 +359,7 @@
                 tabStrip.insertBefore(tabEl, addBtn);
             });
 
+            // Clean up removed tabs from viewport
             viewportContainer.querySelectorAll('.viewport').forEach(vp => { 
                 if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove(); 
             });
@@ -379,6 +382,7 @@
                 zoomCont.style.height = (100 / tab.zoom) + '%';
                 
                 const iframe = vp.querySelector('iframe');
+                // Use getAttribute('src') to avoid cross-origin permission errors when checking iframe state
                 if (isActive && iframe.getAttribute('src') !== tab.proxyUrl) {
                     iframe.src = tab.proxyUrl;
                 }
