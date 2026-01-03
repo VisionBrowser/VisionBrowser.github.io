@@ -1,6 +1,8 @@
 {
   "projects": {
-    "main": "visionontop"
+    "main": "visionontop",
+    "visionbrowser": "vision--browser",
+    "visionontop": "visionontop"
   },
   "targets": {},
   "etags": {}
