@@ -306,8 +306,8 @@
         }
 
         function navigate(input) {
-            input = input.trim();
             if (!input) return;
+            input = input.trim();
             
             let proxyUrl = '';
             const internalPages = ['history.html', 'bookmarks.html', 'newtab.html', 'devtools.html', 'settings.html', 'music.html'];
@@ -315,22 +315,24 @@
             if (internalPages.includes(input)) {
                 proxyUrl = input;
             } else {
-                // Robust URL detection (looking for dots and no spaces)
-                const isUrl = /^https?:\/\//.test(input) || (/^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(input) && !input.includes(' '));
-                let finalTarget = '';
+                // Strict URL vs Search detection
+                // Treat as URL if it starts with http or (has a dot AND no spaces)
+                const isUrl = /^https?:\/\//.test(input) || (!input.includes(' ') && input.includes('.'));
                 
+                let finalTarget = '';
                 if (isUrl) {
                     finalTarget = input;
-                    if (!finalTarget.startsWith('http://') && !finalTarget.startsWith('https://')) {
+                    // Ensure it starts with https:// as requested
+                    if (!/^https?:\/\//.test(finalTarget)) {
                         finalTarget = 'https://' + finalTarget;
                     }
                 } else {
-                    // Google search query as requested
-                    finalTarget = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
+                    // Treat as query - route to Google via custom active/embed method
+                    finalTarget = 'https://www.google.com/search?q=' + encodeURIComponent(input);
                 }
                 
-                // Exclusively using user's /active/embed.html custom method
-                proxyUrl = `active/embed.html?url=${encodeURIComponent(finalTarget)}`;
+                // Construct strictly using YOUR custom method /active/embed.html?url=
+                proxyUrl = 'active/embed.html?url=' + encodeURIComponent(finalTarget);
             }
             
             updateTab(activeTabId, { url: input, proxyUrl, title: input, favicon: getFavicon(input) });
@@ -359,11 +361,12 @@
                 tabStrip.insertBefore(tabEl, addBtn);
             });
 
-            // Clean up removed tabs from viewport
+            // Clean up removed viewports
             viewportContainer.querySelectorAll('.viewport').forEach(vp => { 
                 if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove(); 
             });
 
+            // Handle iframe generation and synchronization
             tabs.forEach(tab => {
                 let vp = viewportContainer.querySelector(`.viewport[data-id="${tab.id}"]`);
                 if (!vp) {
@@ -382,7 +385,7 @@
                 zoomCont.style.height = (100 / tab.zoom) + '%';
                 
                 const iframe = vp.querySelector('iframe');
-                // Use getAttribute('src') to avoid cross-origin permission errors when checking iframe state
+                // Use getAttribute('src') for comparison to avoid permission errors on cross-origin content
                 if (isActive && iframe.getAttribute('src') !== tab.proxyUrl) {
                     iframe.src = tab.proxyUrl;
                 }
