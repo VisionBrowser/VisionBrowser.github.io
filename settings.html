@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -186,10 +187,12 @@
             <div class="control-group">
                 <label class="control-label">Choose a search engine</label>
                 <select id="engine-select" class="vision-select">
-                    <option value="https://www.google.com/search?q=">Google</option>
                     <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+                    <option value="https://www.google.com/search?q=">Google</option>
                     <option value="https://www.bing.com/search?q=">Bing</option>
                     <option value="https://search.yahoo.com/search?p=">Yahoo</option>
+                    <option value="https://search.brave.com/search?q=">Brave Search</option>
+                    <option value="https://www.ecosia.org/search?q=">Ecosia</option>
                 </select>
             </div>
 
@@ -232,92 +235,4 @@
             </div>
 
             <div class="control-group">
-                <label class="control-label">Tab Title Cloak</label>
-                <select class="vision-select">
-                    <option>None (Default)</option>
-                    <option>Google Docs</option>
-                    <option>Canvas</option>
-                    <option>My Drive</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Data Tab -->
-        <div id="data" class="tab-content">
-            <h1 class="section-header">Data</h1>
-            <p class="section-desc">Manage your registry, history, and stored visions.</p>
-            <div class="divider"></div>
-
-            <div class="control-group">
-                <label class="control-label">History</label>
-                <button onclick="clearData('vision_history')" class="vision-btn bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/40">Clear Browsing History</button>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">Bookmarks</label>
-                <button onclick="clearData('vision_bookmarks')" class="vision-btn bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/40">Clear All Bookmarks</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const tabs = document.querySelectorAll('.settings-tab');
-        const contents = document.querySelectorAll('.tab-content');
-        const engineSelect = document.getElementById('engine-select');
-        const cloakBtn = document.getElementById('cloak-btn');
-
-        // Tab Switching Logic
-        tabs.forEach(tab => {
-            tab.onclick = () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                contents.forEach(c => c.classList.remove('active'));
-
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
-            };
-        });
-
-        // Search Engine Logic
-        function updateEngine() {
-            const current = localStorage.getItem('vision_search_engine') || 'https://www.google.com/search?q=';
-            engineSelect.value = current;
-        }
-
-        engineSelect.onchange = () => {
-            localStorage.setItem('vision_search_engine', engineSelect.value);
-        };
-
-        // About:Blank Cloak Logic
-        cloakBtn.onclick = () => {
-            const win = window.open('about:blank', '_blank');
-            if (win) {
-                const doc = win.document;
-                const iframe = doc.createElement('iframe');
-                const style = iframe.style;
-
-                doc.title = 'My Drive - Google Drive';
-                style.position = 'fixed';
-                style.top = '0';
-                style.left = '0';
-                style.bottom = '0';
-                style.right = '0';
-                style.width = '100%';
-                style.height = '100%';
-                style.border = 'none';
-
-                iframe.src = window.parent.location.href;
-                doc.body.appendChild(iframe);
-            }
-        };
-
-        function clearData(key) {
-            if (confirm('Are you sure you want to purge this data segment? This cannot be undone.')) {
-                localStorage.removeItem(key);
-                alert('Data purged from registry.');
-            }
-        }
-
-        updateEngine();
-    </script>
-</body>
-</html>
+                <label class="control-label">Tab Title Cloak</
