@@ -315,21 +315,21 @@
             if (internalPages.includes(input)) {
                 proxyUrl = input;
             } else {
-                // Determine if it's a URL or search query
+                // Strict URL detection: starts with protocol OR has a dot and no spaces
                 const isUrl = /^https?:\/\//.test(input) || (!input.includes(' ') && input.includes('.'));
                 
                 let targetUrl = '';
                 if (isUrl) {
-                    // Normalize to https://domain
+                    // Extract domain and force https://
                     let domain = input.replace(/^https?:\/\//, '');
                     targetUrl = 'https://' + domain;
                 } else {
-                    // Search query - route to Google via custom active/embed method
+                    // It's a query: route to Google search via the custom embed method
                     targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
                 }
                 
-                // EXCLUSIVE CUSTOM METHOD: /active/embed.html?url=https://...
-                proxyUrl = 'active/embed.html?url=' + targetUrl;
+                // STRENGTHENED ROUTING: Use absolute root path for /active/embed.html
+                proxyUrl = '/active/embed.html?url=' + targetUrl;
             }
             
             updateTab(activeTabId, { 
@@ -363,12 +363,11 @@
                 tabStrip.insertBefore(tabEl, addBtn);
             });
 
-            // Clean up viewports
+            // Sync Viewports
             viewportContainer.querySelectorAll('.viewport').forEach(vp => { 
                 if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove(); 
             });
 
-            // Sync Viewports
             tabs.forEach(tab => {
                 let vp = viewportContainer.querySelector(`.viewport[data-id="${tab.id}"]`);
                 if (!vp) {
@@ -387,13 +386,14 @@
                 zoomCont.style.height = (100 / tab.zoom) + '%';
                 
                 const iframe = vp.querySelector('iframe');
+                // Use getAttribute to avoid security issues with cross-origin contentWindow
                 if (isActive && iframe.getAttribute('src') !== tab.proxyUrl) {
                     iframe.src = tab.proxyUrl;
                 }
             });
         }
 
-        // Event Listeners
+        // Standard Event Listeners
         addressBar.onkeydown = (e) => { if (e.key === 'Enter') navigate(addressBar.value); };
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDropdown.classList.toggle('hidden'); };
         document.onclick = () => menuDropdown.classList.add('hidden');
@@ -402,6 +402,7 @@
         document.getElementById('zoom-out-btn').onclick = () => updateTab(activeTabId, { zoom: Math.max(0.25, (tabs.find(t => t.id === activeTabId)?.zoom || 1) - 0.1) });
         document.getElementById('music-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Audio', 'music.html'); };
         document.getElementById('settings-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Settings', 'settings.html'); };
+        
         document.getElementById('refresh-btn').onclick = () => {
             const vp = viewportContainer.querySelector(`.viewport[data-id="${activeTabId}"]`);
             if (vp) {
@@ -409,27 +410,18 @@
                 iframe.src = iframe.src;
             }
         };
-        document.getElementById('back-btn').onclick = () => {
-            const vp = viewportContainer.querySelector(`.viewport[data-id="${activeTabId}"]`);
-            if (vp) try { vp.querySelector('iframe').contentWindow.history.back(); } catch(e) {}
-        };
-        document.getElementById('forward-btn').onclick = () => {
-            const vp = viewportContainer.querySelector(`.viewport[data-id="${activeTabId}"]`);
-            if (vp) try { vp.querySelector('iframe').contentWindow.history.forward(); } catch(e) {}
-        };
 
-        closeSidePanel.onclick = () => sidePanel.classList.remove('open');
-
+        // Navigation messages from child frames
         window.addEventListener('message', (e) => {
             if (e.data.type === 'navigate') navigate(e.data.query);
-            if (e.data.type === 'metadata') updateTab(activeTabId, { title: e.data.title, favicon: e.data.favicon });
+            if (e.data.type === 'metadata') updateTab(activeTabId, { title: e.data.title });
             if (e.data.type === 'request-current-tab') {
                 const tab = tabs.find(t => t.id === activeTabId);
                 e.source.postMessage({ type: 'response-current-tab', url: tab.url, title: tab.title, favicon: tab.favicon }, '*');
             }
         });
 
-        // App Start
+        // Initialize App
         if (!loadSession()) createTab();
         setInterval(() => {
             const now = new Date();
