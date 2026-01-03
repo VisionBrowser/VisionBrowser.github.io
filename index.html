@@ -315,27 +315,29 @@
             if (internalPages.includes(input)) {
                 proxyUrl = input;
             } else {
-                // Strict URL vs Search detection
-                // Treat as URL if it starts with http or (has a dot AND no spaces)
+                // Determine if it's a URL or search query
                 const isUrl = /^https?:\/\//.test(input) || (!input.includes(' ') && input.includes('.'));
                 
-                let finalTarget = '';
+                let targetUrl = '';
                 if (isUrl) {
-                    finalTarget = input;
-                    // Ensure it starts with https:// as requested
-                    if (!/^https?:\/\//.test(finalTarget)) {
-                        finalTarget = 'https://' + finalTarget;
-                    }
+                    // Normalize to https://domain
+                    let domain = input.replace(/^https?:\/\//, '');
+                    targetUrl = 'https://' + domain;
                 } else {
-                    // Treat as query - route to Google via custom active/embed method
-                    finalTarget = 'https://www.google.com/search?q=' + encodeURIComponent(input);
+                    // Search query - route to Google via custom active/embed method
+                    targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
                 }
                 
-                // Construct strictly using YOUR custom method /active/embed.html?url=
-                proxyUrl = 'active/embed.html?url=' + encodeURIComponent(finalTarget);
+                // EXCLUSIVE CUSTOM METHOD: /active/embed.html?url=https://...
+                proxyUrl = 'active/embed.html?url=' + targetUrl;
             }
             
-            updateTab(activeTabId, { url: input, proxyUrl, title: input, favicon: getFavicon(input) });
+            updateTab(activeTabId, { 
+                url: input, 
+                proxyUrl: proxyUrl, 
+                title: input, 
+                favicon: getFavicon(proxyUrl.includes('google.com/search') ? 'https://google.com' : input) 
+            });
             menuDropdown.classList.add('hidden');
         }
 
@@ -361,12 +363,12 @@
                 tabStrip.insertBefore(tabEl, addBtn);
             });
 
-            // Clean up removed viewports
+            // Clean up viewports
             viewportContainer.querySelectorAll('.viewport').forEach(vp => { 
                 if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove(); 
             });
 
-            // Handle iframe generation and synchronization
+            // Sync Viewports
             tabs.forEach(tab => {
                 let vp = viewportContainer.querySelector(`.viewport[data-id="${tab.id}"]`);
                 if (!vp) {
@@ -385,21 +387,37 @@
                 zoomCont.style.height = (100 / tab.zoom) + '%';
                 
                 const iframe = vp.querySelector('iframe');
-                // Use getAttribute('src') for comparison to avoid permission errors on cross-origin content
                 if (isActive && iframe.getAttribute('src') !== tab.proxyUrl) {
                     iframe.src = tab.proxyUrl;
                 }
             });
         }
 
+        // Event Listeners
         addressBar.onkeydown = (e) => { if (e.key === 'Enter') navigate(addressBar.value); };
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDropdown.classList.toggle('hidden'); };
         document.onclick = () => menuDropdown.classList.add('hidden');
         document.getElementById('add-tab-btn').onclick = () => createTab();
-        document.getElementById('zoom-in-btn').onclick = () => updateTab(activeTabId, { zoom: Math.min(3, tabs.find(t => t.id === activeTabId).zoom + 0.1) });
-        document.getElementById('zoom-out-btn').onclick = () => updateTab(activeTabId, { zoom: Math.max(0.25, tabs.find(t => t.id === activeTabId).zoom - 0.1) });
+        document.getElementById('zoom-in-btn').onclick = () => updateTab(activeTabId, { zoom: Math.min(3, (tabs.find(t => t.id === activeTabId)?.zoom || 1) + 0.1) });
+        document.getElementById('zoom-out-btn').onclick = () => updateTab(activeTabId, { zoom: Math.max(0.25, (tabs.find(t => t.id === activeTabId)?.zoom || 1) - 0.1) });
         document.getElementById('music-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Audio', 'music.html'); };
         document.getElementById('settings-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Settings', 'settings.html'); };
+        document.getElementById('refresh-btn').onclick = () => {
+            const vp = viewportContainer.querySelector(`.viewport[data-id="${activeTabId}"]`);
+            if (vp) {
+                const iframe = vp.querySelector('iframe');
+                iframe.src = iframe.src;
+            }
+        };
+        document.getElementById('back-btn').onclick = () => {
+            const vp = viewportContainer.querySelector(`.viewport[data-id="${activeTabId}"]`);
+            if (vp) try { vp.querySelector('iframe').contentWindow.history.back(); } catch(e) {}
+        };
+        document.getElementById('forward-btn').onclick = () => {
+            const vp = viewportContainer.querySelector(`.viewport[data-id="${activeTabId}"]`);
+            if (vp) try { vp.querySelector('iframe').contentWindow.history.forward(); } catch(e) {}
+        };
+
         closeSidePanel.onclick = () => sidePanel.classList.remove('open');
 
         window.addEventListener('message', (e) => {
@@ -411,6 +429,7 @@
             }
         });
 
+        // App Start
         if (!loadSession()) createTab();
         setInterval(() => {
             const now = new Date();
