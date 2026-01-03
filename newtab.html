@@ -16,21 +16,17 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             overflow: hidden;
-            background: var(--default-gradient);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background: transparent;
             height: 100vh;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             user-select: none;
-            transition: background 0.5s ease;
         }
 
         .glass-card {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 40px;
@@ -39,15 +35,6 @@
             width: 100%;
             max-width: 600px;
             text-align: center;
-            transition: transform 0.3s ease;
-            position: relative;
-            z-index: 10;
-        }
-
-        .search-container {
-            position: relative;
-            margin-top: 2rem;
-            width: 100%;
         }
 
         .search-input {
@@ -60,30 +47,12 @@
             font-size: 1.25rem;
             color: white;
             outline: none;
-            transition: all 0.2s ease;
         }
 
         .search-input:focus {
             background: rgba(255, 255, 255, 0.15);
             border-color: rgba(255, 255, 255, 0.4);
             box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.3);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 24px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .clock {
-            font-size: 1.2rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 1rem;
         }
 
         .brand-title {
@@ -96,7 +65,6 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Customize Panel */
         #customize-trigger {
             position: absolute;
             bottom: 2rem;
@@ -108,14 +76,6 @@
             border-radius: 12px;
             color: rgba(255, 255, 255, 0.7);
             cursor: pointer;
-            transition: all 0.2s ease;
-            z-index: 20;
-        }
-
-        #customize-trigger:hover {
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            transform: translateY(-2px);
         }
 
         #customize-panel {
@@ -128,21 +88,10 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 1.5rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             display: none;
             flex-direction: column;
             gap: 1rem;
             z-index: 30;
-        }
-
-        .customize-option {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
         }
 
         .btn-action {
@@ -153,11 +102,6 @@
             cursor: pointer;
             transition: background 0.2s;
             text-align: center;
-            width: 100%;
-        }
-
-        .btn-action:hover {
-            background: #7c3aed;
         }
 
         input[type="color"] {
@@ -169,66 +113,49 @@
             cursor: pointer;
             background: none;
         }
-
-        input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
-
-        input[type="color"]::-webkit-color-swatch {
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-        }
     </style>
 </head>
 <body>
     <div class="glass-card">
         <h1 class="brand-title">Vision</h1>
-        <div id="clock" class="clock">00:00:00 — JAN 01</div>
+        <div id="clock" class="text-xl font-semibold opacity-80 mb-8">00:00:00</div>
 
-        <form id="search-form" class="search-container">
-            <div class="search-icon">
+        <form id="search-form" class="relative">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-white/50">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </div>
             <input type="text" id="search-input" class="search-input" placeholder="What's your next vision?" autofocus autocomplete="off">
         </form>
 
-        <div class="mt-8 flex gap-3 justify-center">
+        <div class="mt-8 flex gap-4 justify-center">
             <a href="#" class="p-3 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
             </a>
             <a href="#" class="p-3 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
             </a>
-            <a href="#" class="p-3 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
-            </a>
         </div>
     </div>
 
-    <!-- Customize Trigger -->
     <button id="customize-trigger" title="Customize Background">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 20v2"/></svg>
     </button>
 
-    <!-- Customize Panel -->
     <div id="customize-panel">
         <div class="text-lg font-bold mb-2 text-purple-400">Appearance</div>
-        
-        <div class="customize-option">
-            <span>Background Image</span>
-            <label class="btn-action">
-                Upload
-                <input type="file" id="bg-upload" accept="image/*" class="hidden">
-            </label>
-        </div>
-
-        <div class="customize-option">
-            <span>Background Color</span>
-            <input type="color" id="bg-color" value="#4c1d95">
-        </div>
-
-        <div class="border-t border-white/10 pt-4 mt-2">
-            <button id="bg-reset" class="btn-action bg-white/10 hover:bg-white/20">Reset to Default</button>
+        <div class="flex flex-col gap-3">
+            <div class="flex justify-between items-center text-sm">
+                <span>Wallpaper</span>
+                <label class="btn-action">
+                    Upload
+                    <input type="file" id="bg-upload" accept="image/*" class="hidden">
+                </label>
+            </div>
+            <div class="flex justify-between items-center text-sm">
+                <span>Color</span>
+                <input type="color" id="bg-color" value="#4c1d95">
+            </div>
+            <button id="bg-reset" class="btn-action bg-white/10">Reset</button>
         </div>
     </div>
 
@@ -236,94 +163,47 @@
         const clockEl = document.getElementById('clock');
         const searchForm = document.getElementById('search-form');
         const searchInput = document.getElementById('search-input');
-        
         const customizeTrigger = document.getElementById('customize-trigger');
         const customizePanel = document.getElementById('customize-panel');
         const bgUpload = document.getElementById('bg-upload');
         const bgColor = document.getElementById('bg-color');
         const bgReset = document.getElementById('bg-reset');
 
-        // Clock Update
         function updateClock() {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const dateStr = now.toLocaleDateString([], { month: 'short', day: '2-digit' }).toUpperCase();
-            clockEl.textContent = `${timeStr} — ${dateStr}`;
+            clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
-
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Search Logic
         searchForm.onsubmit = (e) => {
             e.preventDefault();
             const query = searchInput.value.trim();
-            if (query) {
-                window.parent.postMessage({ type: 'navigate', query }, '*');
-            }
+            if (query) window.parent.postMessage({ type: 'navigate', query }, '*');
         };
 
-        // Customize Panel Toggle
         customizeTrigger.onclick = (e) => {
             e.stopPropagation();
-            const isVisible = customizePanel.style.display === 'flex';
-            customizePanel.style.display = isVisible ? 'none' : 'flex';
+            customizePanel.style.display = customizePanel.style.display === 'flex' ? 'none' : 'flex';
         };
 
-        document.addEventListener('click', (e) => {
-            if (!customizePanel.contains(e.target) && e.target !== customizeTrigger) {
-                customizePanel.style.display = 'none';
-            }
-        });
-
-        // Background Logic
         function setBackground(type, value) {
-            if (type === 'image') {
-                document.body.style.background = `url(${value})`;
-                document.body.style.backgroundSize = 'cover';
-                document.body.style.backgroundPosition = 'center';
-                localStorage.setItem('vision_bg_type', 'image');
-                localStorage.setItem('vision_bg_value', value);
-            } else if (type === 'color') {
-                document.body.style.background = value;
-                localStorage.setItem('vision_bg_type', 'color');
-                localStorage.setItem('vision_bg_value', value);
-            } else {
-                document.body.style.background = 'var(--default-gradient)';
-                localStorage.removeItem('vision_bg_type');
-                localStorage.removeItem('vision_bg_value');
-            }
-        }
-
-        // Load persisted background
-        const savedType = localStorage.getItem('vision_bg_type');
-        const savedValue = localStorage.getItem('vision_bg_value');
-        if (savedType && savedValue) {
-            setBackground(savedType, savedValue);
-            if (savedType === 'color') bgColor.value = savedValue;
+            localStorage.setItem('vision_bg_type', type);
+            localStorage.setItem('vision_bg_value', value);
+            window.parent.postMessage({ type: 'bg-update' }, '*');
         }
 
         bgUpload.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
-            reader.onload = (event) => {
-                setBackground('image', event.target.result);
-            };
+            reader.onload = (event) => setBackground('image', event.target.result);
             reader.readAsDataURL(file);
         };
 
-        bgColor.oninput = (e) => {
-            setBackground('color', e.target.value);
-        };
+        bgColor.oninput = (e) => setBackground('color', e.target.value);
+        bgReset.onclick = () => setBackground('default', '');
 
-        bgReset.onclick = () => {
-            setBackground('default');
-            bgColor.value = '#4c1d95';
-        };
-
-        // Inform browser shell of our title
         window.parent.postMessage({ type: 'metadata', title: 'Vision Home' }, '*');
     </script>
 </body>
