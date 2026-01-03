@@ -210,7 +210,12 @@
         function getFavicon(url) {
             if (!url || url === 'newtab.html') return null;
             try {
-                const domain = new URL(url.startsWith('http') ? url : 'https://' + url).hostname;
+                // If it's a proxy URL, extract the real domain for the icon
+                let targetUrl = url;
+                if (url.includes('url=')) {
+                    targetUrl = decodeURIComponent(url.split('url=')[1]);
+                }
+                const domain = new URL(targetUrl.startsWith('http') ? targetUrl : 'https://' + targetUrl).hostname;
                 return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
             } catch (e) { return null; }
         }
@@ -315,20 +320,21 @@
             if (internalPages.includes(input)) {
                 proxyUrl = input;
             } else {
-                // Strict URL detection: starts with protocol OR has a dot and no spaces
+                // Routing logic as requested:
+                // 1. Is it a URL or search query?
                 const isUrl = /^https?:\/\//.test(input) || (!input.includes(' ') && input.includes('.'));
                 
                 let targetUrl = '';
                 if (isUrl) {
-                    // Extract domain and force https://
+                    // Normalize to https://domain
                     let domain = input.replace(/^https?:\/\//, '');
                     targetUrl = 'https://' + domain;
                 } else {
-                    // It's a query: route to Google search via the custom embed method
+                    // Search query: route to Google search via the custom embed method
                     targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(input);
                 }
                 
-                // STRENGTHENED ROUTING: Use absolute root path for /active/embed.html
+                // Construct the GAWD damn custom method URL
                 proxyUrl = '/active/embed.html?url=' + targetUrl;
             }
             
@@ -336,7 +342,7 @@
                 url: input, 
                 proxyUrl: proxyUrl, 
                 title: input, 
-                favicon: getFavicon(proxyUrl.includes('google.com/search') ? 'https://google.com' : input) 
+                favicon: getFavicon(proxyUrl) 
             });
             menuDropdown.classList.add('hidden');
         }
@@ -363,11 +369,12 @@
                 tabStrip.insertBefore(tabEl, addBtn);
             });
 
-            // Sync Viewports
+            // Clean up removed viewports
             viewportContainer.querySelectorAll('.viewport').forEach(vp => { 
                 if (!tabs.find(t => t.id === vp.dataset.id)) vp.remove(); 
             });
 
+            // Handle iframe generation and synchronization
             tabs.forEach(tab => {
                 let vp = viewportContainer.querySelector(`.viewport[data-id="${tab.id}"]`);
                 if (!vp) {
@@ -386,14 +393,13 @@
                 zoomCont.style.height = (100 / tab.zoom) + '%';
                 
                 const iframe = vp.querySelector('iframe');
-                // Use getAttribute to avoid security issues with cross-origin contentWindow
+                // Only update src if it's different and we are currently active
                 if (isActive && iframe.getAttribute('src') !== tab.proxyUrl) {
                     iframe.src = tab.proxyUrl;
                 }
             });
         }
 
-        // Standard Event Listeners
         addressBar.onkeydown = (e) => { if (e.key === 'Enter') navigate(addressBar.value); };
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDropdown.classList.toggle('hidden'); };
         document.onclick = () => menuDropdown.classList.add('hidden');
@@ -411,17 +417,28 @@
             }
         };
 
-        // Navigation messages from child frames
+        closeSidePanel.onclick = () => sidePanel.classList.remove('open');
+
+        // Notification handler for iFrame content to update shell UI
         window.addEventListener('message', (e) => {
-            if (e.data.type === 'navigate') navigate(e.data.query);
-            if (e.data.type === 'metadata') updateTab(activeTabId, { title: e.data.title });
+            if (e.data.type === 'navigate') {
+                navigate(e.data.query);
+            }
+            if (e.data.type === 'metadata') {
+                // If the message contains a URL, update the address bar and favicon
+                const updates = {};
+                if (e.data.title) {
+                    updates.title = e.data.title;
+                    updates.favicon = getFavicon(e.data.title); // Update favicon based on the target URL
+                }
+                updateTab(activeTabId, updates);
+            }
             if (e.data.type === 'request-current-tab') {
                 const tab = tabs.find(t => t.id === activeTabId);
                 e.source.postMessage({ type: 'response-current-tab', url: tab.url, title: tab.title, favicon: tab.favicon }, '*');
             }
         });
 
-        // Initialize App
         if (!loadSession()) createTab();
         setInterval(() => {
             const now = new Date();
