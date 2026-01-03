@@ -11,8 +11,8 @@
         :root {
             --vision-purple: #8b5cf6;
             --vision-purple-dark: #6d28d9;
-            --vision-bg: #0f0f10;
-            --vision-surface: #1c1c1e;
+            --vision-bg: #000000;
+            --vision-surface: #0a0a0b;
         }
 
         body {
@@ -27,7 +27,6 @@
             user-select: none;
         }
 
-        /* Tab Header */
         .tab-bar {
             display: flex;
             gap: 12px;
@@ -38,15 +37,17 @@
         .settings-tab {
             flex: 1;
             padding: 12px;
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.1);
             border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.4);
         }
 
         .settings-tab.active {
@@ -54,13 +55,11 @@
             border-color: var(--vision-purple);
             color: white;
             box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-            transform: translateY(-2px);
         }
 
-        /* Content Area */
         .content-container {
             flex: 1;
-            padding: 1.5rem;
+            padding: 2rem;
             overflow-y: auto;
             scrollbar-width: none;
         }
@@ -75,46 +74,21 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .section-header {
-            font-size: 2.25rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.02em;
-        }
+        .section-header { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+        .section-desc { font-size: 13px; color: #71717a; margin-bottom: 1.5rem; }
+        .divider { height: 1px; background: rgba(255, 255, 255, 0.05); margin-bottom: 2rem; }
 
-        .section-desc {
-            font-size: 14px;
-            color: #a1a1aa;
-            margin-bottom: 1.5rem;
-            font-weight: 500;
-        }
-
-        .divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        /* Controls */
-        .control-group { margin-bottom: 1.5rem; }
-        .control-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: white;
-        }
+        .control-group { margin-bottom: 2rem; }
+        .control-label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 10px; color: white; text-transform: uppercase; letter-spacing: 0.05em; }
 
         .vision-select {
-            width: auto;
-            min-width: 180px;
-            background: rgba(139, 92, 246, 0.15);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 10px;
-            padding: 10px 32px 10px 16px;
+            width: 100%;
+            background: #0a0a0b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 16px;
             color: white;
             font-size: 13px;
-            font-weight: 600;
             outline: none;
             cursor: pointer;
             appearance: none;
@@ -124,115 +98,143 @@
             background-size: 14px;
         }
 
-        .vision-select:focus {
-            border-color: var(--vision-purple);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
-
         .vision-btn {
             background: var(--vision-purple);
             color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: 12px 24px;
+            border-radius: 12px;
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             transition: all 0.2s;
         }
 
-        .vision-btn:hover { background: var(--vision-purple-dark); transform: scale(1.02); }
-        .vision-btn:active { transform: scale(0.98); }
+        .vision-btn:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        .vision-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .info-text {
-            font-size: 13px;
-            color: #71717a;
-            margin-top: 2rem;
-            line-height: 1.6;
-            font-weight: 500;
+        .info-box {
+            padding: 1rem;
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            font-size: 12px;
+            color: #a1a1aa;
+            line-height: 1.5;
         }
-
-        .accent-text { color: var(--vision-purple); font-weight: 700; }
     </style>
 </head>
 <body>
     <div class="tab-bar">
-        <div class="settings-tab active" data-tab="proxy">Proxy</div>
-        <div class="settings-tab" data-tab="appearance">Appearance</div>
-        <div class="settings-tab" data-tab="cloak">Cloak</div>
-        <div class="settings-tab" data-tab="data">Data</div>
+        <div class="settings-tab active" data-tab="browser">Browser</div>
+        <div class="settings-tab" data-tab="visual">Aesthetics</div>
+        <div class="settings-tab" data-tab="privacy">Privacy</div>
     </div>
 
     <div class="content-container">
-        <!-- Proxy Tab -->
-        <div id="proxy" class="tab-content active">
-            <h1 class="section-header">Proxy</h1>
-            <p class="section-desc">Options to change how the search functionality works.</p>
+        <!-- Browser Section -->
+        <div id="browser" class="tab-content active">
+            <h1 class="section-header">Engine Settings</h1>
+            <p class="section-desc">Manage how Vision interacts with the web.</p>
             <div class="divider"></div>
 
             <div class="control-group">
-                <label class="control-label">Choose your proxy service</label>
-                <select class="vision-select">
-                    <option>Ultraviolet (Default)</option>
-                    <option disabled>Vision Node (Beta)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">Choose the transport the proxy uses</label>
-                <select class="vision-select">
-                    <option>Epoxy</option>
-                    <option>Libcurl</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">Choose a search engine</label>
+                <label class="control-label">Search Provider</label>
                 <select id="engine-select" class="vision-select">
+                    <option value="https://www.google.com/search?q=">Google (Recommended)</option>
                     <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
-                    <option value="https://www.google.com/search?q=">Google</option>
                     <option value="https://www.bing.com/search?q=">Bing</option>
-                    <option value="https://search.yahoo.com/search?p=">Yahoo</option>
-                    <option value="https://search.brave.com/search?q=">Brave Search</option>
-                    <option value="https://www.ecosia.org/search?q=">Ecosia</option>
                 </select>
             </div>
 
-            <p class="info-text">
-                If the proxy stops working, please go to your <span class="accent-text">site settings</span> and clear all site data, then reload. (Make sure to export any data before this)
-            </p>
-        </div>
-
-        <!-- Appearance Tab -->
-        <div id="appearance" class="tab-content">
-            <h1 class="section-header">Appearance</h1>
-            <p class="section-desc">Customize the look and feel of your Vision environment.</p>
-            <div class="divider"></div>
-
             <div class="control-group">
-                <label class="control-label">Vision Theme</label>
+                <label class="control-label">Proxy Protocol</label>
                 <select class="vision-select">
-                    <option>Deep Purple (Default)</option>
-                    <option>Midnight Cyan</option>
-                    <option>Crimson Void</option>
+                    <option>Vision Tunnel v2 (Active)</option>
+                    <option disabled>Direct Node (Locked)</option>
+                </select>
+            </div>
+
+            <div class="info-box mt-8">
+                <strong>Note:</strong> Navigation is currently routed through your custom <code>/active/embed.html</code> gateway for maximum security.
+            </div>
+        </div>
+
+        <!-- Visual Section -->
+        <div id="visual" class="tab-content">
+            <h1 class="section-header">Aesthetics</h1>
+            <p class="section-desc">Customize your visual browsing experience.</p>
+            <div class="divider"></div>
+
+            <div class="control-group">
+                <label class="control-label">Core Theme</label>
+                <select class="vision-select">
+                    <option>Deep Void Purple (Default)</option>
+                    <option>Midnight Gray</option>
+                    <option>Obsidian Blue</option>
                 </select>
             </div>
 
             <div class="control-group">
-                <label class="control-label">New Tab Wallpaper</label>
-                <p class="text-xs text-zinc-500 mb-2">Configure this in the New Tab page settings panel.</p>
+                <label class="control-label">Tab Shape</label>
+                <select class="vision-select">
+                    <option>Modern Rounded (8px)</option>
+                    <option>Classic Block</option>
+                    <option>Sharp Edge</option>
+                </select>
             </div>
         </div>
 
-        <!-- Cloak Tab -->
-        <div id="cloak" class="tab-content">
-            <h1 class="section-header">Cloak</h1>
-            <p class="section-desc">Tab cloaking and About:Blank stealth mode.</p>
+        <!-- Privacy Section -->
+        <div id="privacy" class="tab-content">
+            <h1 class="section-header">Privacy</h1>
+            <p class="section-desc">Control your data and cloaking settings.</p>
             <div class="divider"></div>
+
+            <div class="control-group">
+                <label class="control-label">Clear Session Data</label>
+                <p class="text-xs text-zinc-500 mb-4">Wipe all local storage, tab history, and vision engine metadata.</p>
+                <button id="clear-btn" class="vision-btn bg-red-600">Flush All Data</button>
+            </div>
 
             <div class="control-group">
                 <label class="control-label">About:Blank Cloak</label>
-                <p class="text-xs text-zinc-500 mb-4">Launches the current session inside a hidden about:blank window to hide from history and trackers.</p>
-                <button id="cloak-btn" class="vision-btn">Launch Cloak</button>
+                <p class="text-xs text-zinc-500 mb-4">Run the browser inside a stealth frame to hide from local network history logs.</p>
+                <button class="vision-btn" disabled>Coming Soon</button>
             </div>
+        </div>
+    </div>
 
-            <div class="control-group">
-                <label class="control-label">Tab Title Cloak</
+    <script>
+        const tabs = document.querySelectorAll('.settings-tab');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.onclick = () => {
+                const target = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(target).classList.add('active');
+            };
+        });
+
+        document.getElementById('clear-btn').onclick = () => {
+            if(confirm('This will wipe your vision browser session. Continue?')) {
+                localStorage.clear();
+                window.parent.location.reload();
+            }
+        };
+
+        const engineSelect = document.getElementById('engine-select');
+        engineSelect.onchange = () => {
+            localStorage.setItem('vision_search_engine', engineSelect.value);
+        };
+        
+        const savedEngine = localStorage.getItem('vision_search_engine');
+        if (savedEngine) engineSelect.value = savedEngine;
+
+        window.parent.postMessage({ type: 'metadata', title: 'Vision Settings' }, '*');
+    </script>
+</body>
+</html>
