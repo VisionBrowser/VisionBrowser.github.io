@@ -10,9 +10,9 @@
     <style>
         :root {
             --bg-main: #000000;
-            --bg-toolbar: rgba(10, 10, 11, 0.9);
+            --bg-toolbar: #0a0a0b;
             --bg-tab-active: #000000;
-            --bg-tab-inactive: #0a0a0a;
+            --bg-tab-inactive: #050505;
             --text-main: #ffffff;
             --text-dim: #a1a1aa;
             --accent-purple: #8b5cf6;
@@ -28,20 +28,10 @@
             user-select: none;
         }
 
-        /* Global Background Layer - The actual "whole site" background */
-        #global-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background-size: cover;
-            background-position: center;
-            transition: background 0.5s ease, opacity 0.5s ease;
-        }
-
-        /* Tab Styling - Now strictly black as requested */
+        /* Tab Styling - Solid black as requested */
         .tab {
             position: relative;
-            height: 38px;
+            height: 42px;
             min-width: 160px;
             max-width: 240px;
             padding: 0 16px;
@@ -50,38 +40,38 @@
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
             z-index: 1;
-            border-left: 1px solid rgba(255,255,255,0.05);
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-bottom: none;
+            margin-right: -1px;
         }
 
         .tab.inactive {
             background: var(--bg-tab-inactive);
             color: var(--text-dim);
-            opacity: 0.6;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            opacity: 0.7;
         }
 
         .tab.inactive:hover {
             opacity: 1;
-            background: #111;
+            background: #080808;
         }
 
         .tab.active {
             background: var(--bg-tab-active);
             color: var(--text-main);
             z-index: 10;
+            border-top: 2px solid var(--accent-purple);
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-            border-bottom: none;
         }
 
         /* Toolbar */
         #main-toolbar {
             background: var(--bg-toolbar);
-            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .tool-capsule {
@@ -107,20 +97,19 @@
         .tool-btn:hover {
             background: rgba(255, 255, 255, 0.08);
             color: white;
-            transform: scale(1.05);
         }
 
         /* Address Bar */
         #address-bar-wrapper {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            border-radius: 14px;
             transition: all 0.2s ease;
         }
 
         #address-bar-wrapper:focus-within {
             border-color: var(--accent-purple);
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.8);
         }
 
         /* Side Panel */
@@ -183,20 +172,18 @@
         }
 
         .viewport { background: transparent; }
-        iframe { width: 100%; height: 100%; border: none; background: white; }
+        iframe { width: 100%; height: 100%; border: none; background: transparent; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="h-screen flex flex-col">
-    <div id="global-bg"></div>
-
-    <div id="tab-strip" class="flex items-end px-4 pt-3 h-14 gap-0 overflow-x-auto no-scrollbar bg-black/40 backdrop-blur-md">
+    <div id="tab-strip" class="flex items-end px-4 pt-4 h-14 gap-0 overflow-x-auto no-scrollbar bg-black">
         <button id="add-tab-btn" class="mb-2 ml-2 p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-500">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
     </div>
 
-    <div id="main-toolbar" class="h-16 px-4 flex items-center gap-4 border-b border-white/5 z-20 shadow-xl relative">
+    <div id="main-toolbar" class="h-16 px-4 flex items-center gap-4 z-20 shadow-xl relative">
         <div class="flex items-center gap-1 text-gray-400">
             <button id="back-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
             <button id="forward-btn" class="p-2 hover:bg-white/10 rounded-lg transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
@@ -204,7 +191,7 @@
         </div>
 
         <div class="flex-1 flex items-center h-full">
-            <div id="address-bar-wrapper" class="w-full flex items-center h-10 px-4 rounded-xl group">
+            <div id="address-bar-wrapper" class="w-full flex items-center h-10 px-4 group">
                 <div id="address-icon" class="flex items-center text-gray-500 group-focus-within:text-purple-400 mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
@@ -249,9 +236,9 @@
         </div>
     </div>
 
-    <div id="viewport-container" class="flex-1 relative overflow-hidden"></div>
+    <div id="viewport-container" class="flex-1 relative overflow-hidden bg-white"></div>
 
-    <div class="h-8 bg-black/90 text-[9px] font-bold uppercase tracking-[0.2em] text-gray-600 px-5 flex items-center justify-between border-t border-white/5 z-30">
+    <div class="h-8 bg-black text-[9px] font-bold uppercase tracking-[0.2em] text-gray-600 px-5 flex items-center justify-between border-t border-white/5 z-30">
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
                 <div class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div>
@@ -278,22 +265,7 @@
         const sidePanelTitle = document.getElementById('side-panel-title');
         const sidePanelIframe = document.getElementById('side-panel-iframe');
         const closeSidePanel = document.getElementById('close-side-panel');
-        const globalBg = document.getElementById('global-bg');
         const zoomDisplay = document.getElementById('zoom-display');
-
-        function applyGlobalBackground() {
-            const type = localStorage.getItem('vision_bg_type');
-            const value = localStorage.getItem('vision_bg_value');
-            if (type === 'image') {
-                globalBg.style.background = `url(${value})`;
-                globalBg.style.backgroundSize = 'cover';
-                globalBg.style.backgroundPosition = 'center';
-            } else if (type === 'color') {
-                globalBg.style.background = value;
-            } else {
-                globalBg.style.background = 'linear-gradient(135deg, #050507 0%, #1a1a2e 100%)';
-            }
-        }
 
         function getFavicon(url) {
             if (!url || url === 'newtab.html') return null;
@@ -456,7 +428,6 @@
 
         window.addEventListener('message', (e) => {
             if (e.data.type === 'navigate') navigate(e.data.query);
-            if (e.data.type === 'bg-update') applyGlobalBackground();
             if (e.data.type === 'metadata') updateTab(activeTabId, { title: e.data.title, favicon: e.data.favicon || getFavicon(tabs.find(t => t.id === activeTabId).url) });
             if (e.data.type === 'request-current-tab') {
                 const t = tabs.find(t => t.id === activeTabId);
@@ -475,7 +446,6 @@
         closeSidePanel.onclick = () => sidePanel.classList.remove('open');
 
         if (!loadSession()) createTab();
-        applyGlobalBackground();
         setInterval(() => {
             const now = new Date();
             currentDatetimeEl.textContent = `${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} — ${now.toLocaleDateString([], { month: 'short', day: '2-digit' })}`;
