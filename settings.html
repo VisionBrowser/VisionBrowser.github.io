@@ -168,7 +168,7 @@
 
             <div class="control-group">
                 <label class="control-label">Core Theme</label>
-                <select class="vision-select">
+                <select id="theme-select" class="vision-select">
                     <option>Deep Void Purple (Default)</option>
                     <option>Midnight Gray</option>
                     <option>Obsidian Blue</option>
@@ -177,7 +177,7 @@
 
             <div class="control-group">
                 <label class="control-label">Tab Shape</label>
-                <select class="vision-select">
+                <select id="shape-select" class="vision-select">
                     <option>Modern Rounded (8px)</option>
                     <option>Classic Block</option>
                     <option>Sharp Edge</option>
@@ -219,20 +219,46 @@
             };
         });
 
+        function notifyUpdate() {
+            window.parent.postMessage({ type: 'update-settings' }, '*');
+        }
+
+        const engineSelect = document.getElementById('engine-select');
+        const themeSelect = document.getElementById('theme-select');
+        const shapeSelect = document.getElementById('shape-select');
+
+        // Load current settings
+        const savedEngine = localStorage.getItem('vision_search_engine');
+        if (savedEngine) engineSelect.value = savedEngine;
+
+        const savedTheme = localStorage.getItem('vision_theme');
+        if (savedTheme) themeSelect.value = savedTheme;
+
+        const savedShape = localStorage.getItem('vision_tab_shape');
+        if (savedShape) shapeSelect.value = savedShape;
+
+        // Change listeners
+        engineSelect.onchange = () => {
+            localStorage.setItem('vision_search_engine', engineSelect.value);
+            notifyUpdate();
+        };
+
+        themeSelect.onchange = () => {
+            localStorage.setItem('vision_theme', themeSelect.value);
+            notifyUpdate();
+        };
+
+        shapeSelect.onchange = () => {
+            localStorage.setItem('vision_tab_shape', shapeSelect.value);
+            notifyUpdate();
+        };
+
         document.getElementById('clear-btn').onclick = () => {
             if(confirm('This will wipe your vision browser session. Continue?')) {
                 localStorage.clear();
                 window.parent.location.reload();
             }
         };
-
-        const engineSelect = document.getElementById('engine-select');
-        engineSelect.onchange = () => {
-            localStorage.setItem('vision_search_engine', engineSelect.value);
-        };
-        
-        const savedEngine = localStorage.getItem('vision_search_engine');
-        if (savedEngine) engineSelect.value = savedEngine;
 
         window.parent.postMessage({ type: 'metadata', title: 'Vision Settings' }, '*');
     </script>
