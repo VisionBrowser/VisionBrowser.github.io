@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vision</title>
+    <title>Vision Browser</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -12,7 +12,7 @@
             --tab-active: #0f0f0f;
             --text-main: #ffffff;
             --text-dim: #777777;
-            --border: rgba(255, 255, 255, 0.06);
+            --border: rgba(255, 255, 255, 0.05);
             --input-gray: #121212;
         }
 
@@ -30,26 +30,24 @@
         .tab-strip {
             display: flex;
             align-items: flex-end;
-            padding-left: 12px;
-            padding-top: 6px;
-            height: 40px;
+            padding-left: 8px;
+            padding-top: 8px;
+            height: 42px;
             background: var(--bg);
             z-index: 30;
-            overflow: visible;
         }
 
         .tabs-container {
             display: flex;
             align-items: flex-end;
             gap: 0;
-            overflow: visible;
         }
 
         .tab {
             position: relative;
-            height: 32px;
-            width: 180px;
-            padding: 0 12px;
+            height: 34px;
+            width: 190px;
+            padding: 0 14px;
             display: flex;
             align-items: center;
             font-size: 11px;
@@ -60,8 +58,6 @@
             transition: color 0.2s;
             border-radius: 10px 10px 0 0;
         }
-
-        .tab:hover { color: #aaa; }
 
         .tab.active {
             background: var(--tab-active);
@@ -95,7 +91,7 @@
         .tab-favicon {
             width: 14px;
             height: 14px;
-            margin-right: 8px;
+            margin-right: 10px;
             border-radius: 3px;
             flex-shrink: 0;
         }
@@ -119,15 +115,15 @@
             transition: all 0.2s;
         }
 
-        .tab:hover .tab-close, .tab.active .tab-close { opacity: 0.5; }
+        .tab:hover .tab-close, .tab.active .tab-close { opacity: 0.4; }
         .tab-close:hover { opacity: 1 !important; background: rgba(255,255,255,0.1); }
 
         .nav-bar {
             background: var(--nav-bg);
-            height: 44px;
+            height: 48px;
             display: flex;
             align-items: center;
-            padding: 0 12px;
+            padding: 0 16px;
             border-bottom: 1px solid var(--border);
             position: relative;
             z-index: 20;
@@ -135,55 +131,56 @@
 
         .nav-controls {
             display: flex;
-            gap: 4px;
-            margin-right: 12px;
+            gap: 6px;
+            margin-right: 16px;
         }
 
         .nav-btn {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
-            color: #555;
+            border-radius: 8px;
+            color: #444;
             transition: all 0.2s;
         }
 
-        .nav-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
 
         .address-box {
             position: relative;
-            width: 950px;
+            width: 100%;
+            max-width: 950px;
             margin: 0 auto;
         }
 
         .address-bar {
             width: 100%;
-            height: 32px;
+            height: 34px;
             background: var(--input-gray);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 0 32px;
+            border-radius: 17px;
+            padding: 0 40px;
             font-size: 13px;
-            color: #999;
+            color: #888;
             outline: none;
             transition: all 0.2s;
             text-align: center;
         }
 
         .address-bar:focus {
-            border-color: #444;
+            border-color: #333;
             color: #fff;
-            background: #1a1a1a;
+            background: #181818;
         }
 
         .address-icon {
             position: absolute;
-            left: 12px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #444;
+            color: #333;
         }
 
         .viewport {
@@ -205,15 +202,15 @@
         .webview.active { display: block; }
 
         #add-tab {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             margin-left: 20px;
-            color: #444;
-            border-radius: 4px;
+            color: #333;
+            border-radius: 6px;
             transition: all 0.2s;
         }
         #add-tab:hover { color: #fff; background: rgba(255,255,255,0.05); }
@@ -239,9 +236,9 @@
             <div class="address-icon">
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             </div>
-            <input type="text" id="address-input" class="address-bar" placeholder="Search Vision" autocomplete="off" spellcheck="false">
+            <input type="text" id="address-input" class="address-bar" placeholder="Vision Search" autocomplete="off" spellcheck="false">
         </div>
-        <div style="width: 100px;"></div>
+        <div style="width: 120px;"></div>
     </div>
 
     <div class="viewport" id="viewport"></div>
@@ -263,15 +260,19 @@
             const val = input.trim();
             if (!val) return 'newtab.html';
 
-            if (val.startsWith('https://')) {
-                return `/active/embed.html?url=${val}`;
-            } else if (val.startsWith('http://')) {
-                return `/active/embed.html?url=${val}`;
+            // Clean input to detect if it's already a full URL or needs a proxy
+            let targetUrl = val;
+            if (val.startsWith('https://') || val.startsWith('http://')) {
+                // Ensure it's https
+                targetUrl = val.replace(/^http:\/\//, 'https://');
             } else if (val.includes('.') && !val.includes(' ')) {
-                return `/active/embed.html?url=https://${val}`;
+                targetUrl = `https://${val}`;
             } else {
-                return `/active/embed.html?url=https://www.google.com/search?q=${encodeURIComponent(val)}`;
+                targetUrl = `https://www.google.com/search?q=${encodeURIComponent(val)}`;
             }
+
+            // Always wrap in the embed proxy to avoid fetch errors and iframe restrictions
+            return `/active/embed.html?url=${encodeURIComponent(targetUrl)}`;
         }
 
         function getDisplayUrl(url) {
@@ -298,7 +299,7 @@
             const id = createId();
             const tab = {
                 id, url, title,
-                favicon: url === 'newtab.html' ? FAVICON_SERVICE + 'google.com' : FAVICON_SERVICE + extractDomain(url)
+                favicon: url === 'newtab.html' ? FAVICON_SERVICE + 'vision.ai' : FAVICON_SERVICE + extractDomain(url)
             };
             tabs.push(tab);
 
