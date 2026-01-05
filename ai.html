@@ -47,16 +47,25 @@
                 
                 const aiMsg = addMsg('Thinking...', 'ai');
                 
+                const apiKey = window.process?.env?.API_KEY;
+                if (!apiKey) {
+                    aiMsg.textContent = "Error: API Key not detected. Please verify your system configuration.";
+                    return;
+                }
+
                 try {
-                    const aiClient = new GoogleGenAI({ apiKey: window.process?.env?.API_KEY });
+                    const aiClient = new GoogleGenAI({ apiKey });
                     const response = await aiClient.models.generateContent({
-                        model: 'gemini-2.5-flash-lite-latest',
+                        model: 'gemini-3-flash-preview',
                         contents: query,
-                        config: { systemInstruction: "You are Vision AI, a helpful browser assistant built into the Vision Browser. Be concise and friendly." }
+                        config: { 
+                            systemInstruction: "You are Vision AI, a helpful browser assistant built into the Vision Browser. Be concise and friendly.",
+                            thinkingConfig: { thinkingBudget: 0 }
+                        }
                     });
                     aiMsg.textContent = response.text || "I'm sorry, I couldn't generate a response.";
                 } catch (err) {
-                    aiMsg.textContent = "Error: System connection restricted.";
+                    aiMsg.textContent = "Error: System connection restricted or model unavailable.";
                     console.error(err);
                 }
             }
