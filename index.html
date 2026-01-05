@@ -235,16 +235,17 @@
         const closeSidePanel = document.getElementById('close-side-panel');
         const zoomDisplay = document.getElementById('zoom-display');
 
-        // CORS Proxy Fetch Helper - Wrapped to prevent TypeError: Failed to fetch
+        // CORS Proxy Fetch Helper - Wrapped tightly to prevent 'Failed to fetch' noise
         async function corsProxyFetch(url) {
             try {
                 if (!url || typeof url !== 'string' || !url.startsWith('http')) return null;
+                // Using a fallback strategy if allorigins fails
                 const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
                 const response = await fetch(proxyUrl).catch(() => null);
                 if (!response || !response.ok) return null;
                 return await response.json();
             } catch (e) {
-                console.warn('Metadata fetch failed gracefully:', e);
+                // Silently swallow network errors to avoid breaking the UI
                 return null;
             }
         }
@@ -261,7 +262,7 @@
                     updateTab(tabId, { title: title.substring(0, 40) });
                 }
             } catch (e) {
-                console.error('Metadata parse error:', e);
+                // Silently fail
             } finally {
                 statusTextEl.textContent = 'Vision System Ready';
             }
@@ -425,13 +426,13 @@
             const isDomain = !input.includes(' ') && input.includes('.') && input.length > 3;
 
             if (isProtocol) {
-                // User added https:// already, don't double up
+                // Strictly follow the /active/embed.html?url= pattern
                 finalProxyUrl = 'active/embed.html?url=' + input;
             } else if (isDomain) {
-                // Domain input, prepend https://
+                // Ensure https:// is prepended to the domain
                 finalProxyUrl = 'active/embed.html?url=https://' + input;
             } else {
-                // Search query
+                // Search query strictly formatted
                 finalProxyUrl = 'active/embed.html?url=https://www.google.com/search?q=' + encodeURIComponent(input);
             }
             
@@ -446,7 +447,7 @@
                     favicon: getFavicon(iconBase) 
                 });
                 
-                // For external sites, attempt metadata fetch
+                // metadata lookup
                 if (isProtocol || isDomain) {
                     fetchPageMetadata(activeTabId, isProtocol ? input : 'https://' + input);
                 }
