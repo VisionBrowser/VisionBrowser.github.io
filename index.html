@@ -154,7 +154,7 @@
 
         .address-box {
             position: relative;
-            width: 460px; /* Reduced length as requested */
+            width: 800px; /* Made the URL address bar longer */
             margin: 0 auto;
         }
 
@@ -268,10 +268,8 @@
             if (val.startsWith('https://')) {
                 return `/active/embed.html?url=${val}`;
             } else if (val.includes('.') && !val.includes(' ')) {
-                // If it's a domain, add https:// and wrap in embed
                 return `/active/embed.html?url=https://${val}`;
             } else {
-                // If it's a query, use Google search logic
                 return `/active/embed.html?url=https://www.google.com/search?q=${encodeURIComponent(val)}`;
             }
         }
