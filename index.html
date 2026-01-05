@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,6 +160,8 @@
             </div>
 
             <div class="flex items-center gap-1">
+                <button id="apps-trigger" class="tool-btn" title="Apps"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></button>
+                <button id="games-trigger" class="tool-btn" title="Games"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><circle cx="15" cy="13" r="1"></circle><circle cx="18" cy="11" r="1"></circle><rect x="2" y="6" width="20" height="12" rx="2"></rect></svg></button>
                 <button id="bookmarks-trigger" class="tool-btn" title="Bookmarks"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
                 <button id="music-trigger" class="tool-btn" title="Audio"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></button>
                 <button id="settings-trigger" class="tool-btn" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -206,7 +207,7 @@
     </div>
 
     <script>
-        // Vision Runtime Logic - Integrated to fix fetch error and handle side panels
+        // Vision Browser Runtime - Integrated into index.html for static site compatibility
         let tabs = [];
         let activeTabId = null;
 
@@ -246,6 +247,20 @@
             document.documentElement.style.setProperty('--accent-color', accent);
             document.documentElement.style.setProperty('--bg-toolbar', bgAlt);
             document.documentElement.style.setProperty('--tab-radius', radius);
+        }
+
+        /** 
+         * Mock CORS/Proxy Handling
+         * Since we're in a static site, we "handle" CORS by wrapping external URLs 
+         * in our own proxy/embed page that manages iframe restrictions visually.
+         */
+        function handleNavigationRoute(url) {
+            const internalPages = ['history.html', 'bookmarks.html', 'newtab.html', 'devtools.html', 'settings.html', 'music.html'];
+            if (internalPages.some(page => url.includes(page))) {
+                return url;
+            }
+            // For external URLs, we use the active/embed gateway to "bypass" CORS-related frame errors
+            return 'active/embed.html?url=' + encodeURIComponent(url);
         }
 
         function getFavicon(url) {
@@ -358,7 +373,6 @@
 
         function toggleSidePanel(title, src) {
             const isOpen = sidePanel.classList.contains('open');
-            // Extract filename from full src for robust matching
             const currentSrcFile = sidePanelIframe.src.split('/').pop().split('?')[0];
             const targetSrcFile = src.split('/').pop().split('?')[0];
 
@@ -377,29 +391,32 @@
             input = input.trim();
             const searchEngine = localStorage.getItem('vision_search_engine') || 'https://www.google.com/search?q=';
             
-            let proxyUrl = '';
+            let targetUrl = '';
             const internalPages = ['history.html', 'bookmarks.html', 'newtab.html', 'devtools.html', 'settings.html', 'music.html'];
             
             if (internalPages.includes(input)) {
-                proxyUrl = input;
+                targetUrl = input;
             } else {
+                // Determine if it's a URL or search query
                 const isUrl = /^https?:\/\//.test(input) || (!input.includes(' ') && input.includes('.') && input.length > 3);
-                let targetUrl = '';
                 if (isUrl) {
                     targetUrl = input.startsWith('http') ? input : 'https://' + input;
                 } else {
                     targetUrl = searchEngine + encodeURIComponent(input);
                 }
-                proxyUrl = 'active/embed.html?url=' + encodeURIComponent(targetUrl);
-                saveHistory(targetUrl, input);
             }
             
-            updateTab(activeTabId, { 
-                url: input, 
-                proxyUrl: proxyUrl, 
-                title: input, 
-                favicon: getFavicon(proxyUrl) 
-            });
+            const finalProxyUrl = handleNavigationRoute(targetUrl);
+            saveHistory(targetUrl, input);
+            
+            if (activeTabId) {
+                updateTab(activeTabId, { 
+                    url: input, 
+                    proxyUrl: finalProxyUrl, 
+                    title: input, 
+                    favicon: getFavicon(finalProxyUrl) 
+                });
+            }
             menuDropdown.classList.add('hidden');
         }
 
@@ -454,7 +471,7 @@
             });
         }
 
-        // Initial Events
+        // Global Event Handlers
         addressBar.onkeydown = (e) => { if (e.key === 'Enter') navigate(addressBar.value); };
         menuBtn.onclick = (e) => { e.stopPropagation(); menuDropdown.classList.toggle('hidden'); };
         document.onclick = () => menuDropdown.classList.add('hidden');
@@ -462,10 +479,14 @@
         document.getElementById('zoom-in-btn').onclick = () => updateTab(activeTabId, { zoom: Math.min(3, (tabs.find(t => t.id === activeTabId)?.zoom || 1) + 0.1) });
         document.getElementById('zoom-out-btn').onclick = () => updateTab(activeTabId, { zoom: Math.max(0.25, (tabs.find(t => t.id === activeTabId)?.zoom || 1) - 0.1) });
 
+        // Toolbar Button Events
+        document.getElementById('apps-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Apps', 'newtab.html'); };
+        document.getElementById('games-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Games', 'newtab.html'); };
         document.getElementById('bookmarks-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Bookmarks', 'bookmarks.html'); };
         document.getElementById('music-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Audio', 'music.html'); };
         document.getElementById('settings-trigger').onclick = (e) => { e.stopPropagation(); toggleSidePanel('Settings', 'settings.html'); };
 
+        // Menu Dropdown Events
         document.getElementById('menu-history').onclick = () => { navigate('history.html'); menuDropdown.classList.add('hidden'); };
         document.getElementById('menu-bookmarks').onclick = () => { toggleSidePanel('Bookmarks', 'bookmarks.html'); menuDropdown.classList.add('hidden'); };
         document.getElementById('menu-devtools').onclick = () => { navigate('devtools.html'); menuDropdown.classList.add('hidden'); };
@@ -484,6 +505,7 @@
             sidePanel.classList.remove('open');
         };
 
+        // PostMessage Communication (for internal pages)
         window.addEventListener('message', (e) => {
             if (e.data.type === 'navigate') navigate(e.data.query);
             if (e.data.type === 'metadata') {
@@ -492,7 +514,7 @@
                     updates.title = e.data.title;
                     updates.favicon = getFavicon(e.data.title);
                 }
-                updateTab(activeTabId, updates);
+                if (activeTabId) updateTab(activeTabId, updates);
             }
             if (e.data.type === 'request-current-tab') {
                 const tab = tabs.find(t => t.id === activeTabId);
@@ -501,6 +523,7 @@
             if (e.data.type === 'update-settings') applySystemSettings();
         });
 
+        // Initialize
         applySystemSettings();
         if (!loadSession()) createTab();
 
