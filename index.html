@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Browser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --bg-ui: #111111;
+            --bg-tab-active: #1a1a1a;
+            --accent: #ffffff;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+        }
+
+        /* Tab Bar Styling */
+        .tab-bar {
+            display: flex;
+            align-items: flex-end;
+            height: 40px;
+            background: var(--bg-dark);
+            padding: 0 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tabs-list {
+            display: flex;
+            align-items: flex-end;
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .tabs-list::-webkit-scrollbar { display: none; }
+
+        .tab {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 32px;
+            min-width: 160px;
+            max-width: 220px;
+            background: #0a0a0a;
+            color: #777;
+            padding: 0 14px;
+            margin-right: 4px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.15s ease;
+            font-size: 11px;
+            font-weight: 500;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .tab.active {
+            background: var(--bg-tab-active);
+            color: #fff;
+            z-index: 10;
+        }
+
+        /* The custom rounding using mask-image logic as requested */
+        .tab.active::before,
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 10px;
+            height: 10px;
+            background: var(--bg-tab-active);
+            pointer-events: none;
+        }
+
+        .tab.active::before {
+            left: -10px;
+            mask-image: radial-gradient(circle at 0 0, transparent 10px, black 10px);
+            -webkit-mask-image: radial-gradient(circle at 0 0, transparent 10px, black 10px);
+        }
+
+        .tab.active::after {
+            right: -10px;
+            mask-image: radial-gradient(circle at 100% 0, transparent 10px, black 10px);
+            -webkit-mask-image: radial-gradient(circle at 100% 0, transparent 10px, black 10px);
+        }
+
+        .tab-icon {
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .tab-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tab-close {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            margin-left: 6px;
+            opacity: 0;
+        }
+
+        .tab:hover .tab-close, .tab.active .tab-close {
+            opacity: 1;
+        }
+
+        .tab-close:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Navigation Bar Styling */
+        .nav-bar {
+            height: 44px;
+            background: var(--bg-ui);
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: #888;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        .address-bar-container {
+            flex: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .address-bar {
+            width: 100%;
+            height: 28px;
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 0 34px;
+            color: #ccc;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none;
+        }
+
+        .address-bar:focus {
+            border-color: #444;
+        }
+
+        .address-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #444;
+        }
+
+        /* Viewport Styling */
+        .viewport {
+            flex: 1;
+            background: #000;
+            position: relative;
+        }
+
+        .webview {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+            background: #fff;
+        }
+
+        .webview.active {
+            display: block;
+        }
+
+        #add-tab-btn {
+            width: 28px;
+            height: 28px;
+            margin-bottom: 4px;
+            margin-left: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            color: #555;
+            transition: all 0.2s;
+        }
+        #add-tab-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="tab-bar">
+        <div class="tabs-list" id="tabs-list"></div>
+        <button id="add-tab-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        </button>
+    </div>
+
+    <div class="nav-bar">
+        <div class="flex gap-1">
+            <button class="nav-btn" id="back-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <button class="nav-btn" id="forward-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+            <button class="nav-btn" id="refresh-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+        </div>
+
+        <div class="address-bar-container">
+            <div class="address-icon"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
+            <input type="text" class="address-bar" id="address-input" placeholder="Search or type a URL">
+        </div>
+    </div>
+
+    <div class="viewport" id="viewport"></div>
+
+    <script>
+        const tabsList = document.getElementById('tabs-list');
+        const viewport = document.getElementById('viewport');
+        const addressInput = document.getElementById('address-input');
+        const addTabBtn = document.getElementById('add-tab-btn');
+        
+        let tabs = [];
+        let activeTabId = null;
+
+        const FAVICON_SERVICE = 'https://www.google.com/s2/favicons?sz=64&domain=';
+
+        function createId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        function extractDomain(url) {
+            try {
+                if (url.includes('url=')) {
+                    const parts = url.split('url=');
+                    const target = decodeURIComponent(parts[1]);
+                    return new URL(target).hostname;
+                }
+                return new URL(url).hostname;
+            } catch (e) {
+                return 'vision.inc';
+            }
+        }
+
+        function getEmbedUrl(input) {
+            const val = input.trim();
+            if (!val) return 'newtab.html';
+
+            const isDomain = val.includes('.') && !val.includes(' ');
+            
+            if (isDomain) {
+                let url = val;
+                if (!url.startsWith('http')) {
+                    url = 'https://' + url;
+                }
+                // Request requirement: /active/embed.html?url=https://
+                return `/active/embed.html?url=${url}`;
+            } else {
+                // Request requirement: /active/embed.html?url=https://www.google.com/search?q=QUERY
+                return `/active/embed.html?url=https://www.google.com/search?q=${encodeURIComponent(val)}`;
+            }
+        }
+
+        function addTab(url = 'newtab.html', title = 'New Tab') {
+            const id = createId();
+            const tab = {
+                id,
+                url,
+                title,
+                favicon: url === 'newtab.html' ? FAVICON_SERVICE + 'vision.inc' : FAVICON_SERVICE + extractDomain(url)
+            };
+            tabs.push(tab);
+            
+            const iframe = document.createElement('iframe');
+            iframe.id = `iframe-${id}`;
+            iframe.className = 'webview';
+            iframe.src = url;
+            viewport.appendChild(iframe);
+
+            setActiveTab(id);
+        }
+
+        function setActiveTab(id) {
+            activeTabId = id;
+            const currentTab = tabs.find(t => t.id === id);
+            
+            document.querySelectorAll('.webview').forEach(ifrm => {
+                ifrm.classList.toggle('active', ifrm.id === `iframe-${id}`);
+            });
+
+            if (currentTab.url === 'newtab.html') {
+                addressInput.value = '';
+            } else {
+                if (currentTab.url.includes('url=')) {
+                    const target = currentTab.url.split('url=')[1];
+                    addressInput.value = decodeURIComponent(target);
+                } else {
+                    addressInput.value = currentTab.url;
+                }
+            }
+
+            renderTabs();
+        }
+
+        function closeTab(id, e) {
+            if (e) e.stopPropagation();
+            if (tabs.length === 1) {
+                const tab = tabs[0];
+                tab.url = 'newtab.html';
+                tab.title = 'New Tab';
+                document.getElementById(`iframe-${tab.id}`).src = 'newtab.html';
+                setActiveTab(tab.id);
+                return;
+            }
+
+            const index = tabs.findIndex(t => t.id === id);
+            tabs = tabs.filter(t => t.id !== id);
+            document.getElementById(`iframe-${id}`).remove();
+
+            if (activeTabId === id) {
+                const nextTab = tabs[index] || tabs[index - 1];
+                setActiveTab(nextTab.id);
+            } else {
+                renderTabs();
+            }
+        }
+
+        function renderTabs() {
+            tabsList.innerHTML = '';
+            tabs.forEach(tab => {
+                const tabEl = document.createElement('div');
+                tabEl.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
+                tabEl.onclick = () => setActiveTab(tab.id);
+
+                const icon = document.createElement('img');
+                icon.className = 'tab-icon';
+                icon.src = tab.favicon;
+                icon.onerror = () => icon.src = FAVICON_SERVICE + 'google.com';
+
+                const title = document.createElement('span');
+                title.className = 'tab-title';
+                title.textContent = tab.title;
+
+                const close = document.createElement('div');
+                close.className = 'tab-close';
+                close.innerHTML = `<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+                close.onclick = (e) => closeTab(tab.id, e);
+
+                tabEl.appendChild(icon);
+                tabEl.appendChild(title);
+                tabEl.appendChild(close);
+                tabsList.appendChild(tabEl);
+            });
+        }
+
+        addressInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                const url = getEmbedUrl(addressInput.value);
+                const currentTab = tabs.find(t => t.id === activeTabId);
+                
+                currentTab.url = url;
+                currentTab.title = addressInput.value.trim() || 'Vision Page';
+                currentTab.favicon = FAVICON_SERVICE + extractDomain(url);
+                
+                document.getElementById(`iframe-${activeTabId}`).src = url;
+                renderTabs();
+                addressInput.blur();
+            }
+        };
+
+        addTabBtn.onclick = () => addTab();
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'navigate') {
+                addressInput.value = event.data.query;
+                const e = new KeyboardEvent('keydown', { key: 'Enter' });
+                addressInput.onkeydown(e);
+            }
+        });
+
+        // Start
+        addTab();
+
+        // Nav functions
+        document.getElementById('back-btn').onclick = () => { try { document.getElementById(`iframe-${activeTabId}`).contentWindow.history.back(); } catch(e) {} };
+        document.getElementById('forward-btn').onclick = () => { try { document.getElementById(`iframe-${activeTabId}`).contentWindow.history.forward(); } catch(e) {} };
+        document.getElementById('refresh-btn').onclick = () => { const f = document.getElementById(`iframe-${activeTabId}`); f.src = f.src; };
+    </script>
+</body>
+</html>
