@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vision Browser</title>
+    <title>Vision</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,10 +11,9 @@
     <style>
         :root {
             --bg-dark: #000000;
-            --bg-ui: #0a0a0a;
-            --bg-tab-active: #141414;
-            --accent: #ffffff;
-            --border: rgba(255, 255, 255, 0.1);
+            --bg-ui: #050505;
+            --bg-tab-active: #0f0f0f;
+            --border: rgba(255, 255, 255, 0.06);
         }
 
         body {
@@ -31,9 +30,9 @@
         .tab-bar {
             display: flex;
             align-items: flex-end;
-            height: 44px;
+            height: 38px;
             background: var(--bg-dark);
-            padding: 0 10px;
+            padding: 0 12px;
             border-bottom: 1px solid var(--border);
         }
 
@@ -50,16 +49,16 @@
             position: relative;
             display: flex;
             align-items: center;
-            height: 36px;
-            min-width: 140px;
-            max-width: 200px;
-            background: #080808;
+            height: 30px;
+            min-width: 150px;
+            max-width: 210px;
+            background: #000;
             color: #555;
-            padding: 0 16px;
-            margin-right: 4px;
+            padding: 0 14px;
+            margin-right: 2px;
             cursor: pointer;
             border-radius: 10px 10px 0 0;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             font-size: 11px;
             font-weight: 500;
             user-select: none;
@@ -67,20 +66,13 @@
         }
 
         .tab:hover {
-            background: #111;
-            color: #aaa;
-            transform: translateY(-1px);
-        }
-
-        .tab:active {
-            transform: scale(0.97);
+            color: #999;
         }
 
         .tab.active {
             background: var(--bg-tab-active);
             color: #fff;
             z-index: 10;
-            transform: translateY(0);
         }
 
         .tab.active::before,
@@ -88,28 +80,28 @@
             content: '';
             position: absolute;
             bottom: 0;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             background: var(--bg-tab-active);
             pointer-events: none;
         }
 
         .tab.active::before {
-            left: -12px;
-            mask-image: radial-gradient(circle at 0 0, transparent 12px, black 12px);
-            -webkit-mask-image: radial-gradient(circle at 0 0, transparent 12px, black 12px);
+            left: -10px;
+            mask-image: radial-gradient(circle at 0 0, transparent 10px, black 10px);
+            -webkit-mask-image: radial-gradient(circle at 0 0, transparent 10px, black 10px);
         }
 
         .tab.active::after {
-            right: -12px;
-            mask-image: radial-gradient(circle at 100% 0, transparent 12px, black 12px);
-            -webkit-mask-image: radial-gradient(circle at 100% 0, transparent 12px, black 12px);
+            right: -10px;
+            mask-image: radial-gradient(circle at 100% 0, transparent 10px, black 10px);
+            -webkit-mask-image: radial-gradient(circle at 100% 0, transparent 10px, black 10px);
         }
 
         .tab-icon {
             width: 14px;
             height: 14px;
-            margin-right: 10px;
+            margin-right: 8px;
             flex-shrink: 0;
         }
 
@@ -121,50 +113,49 @@
         }
 
         .tab-close {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 4px;
-            margin-left: 8px;
+            margin-left: 6px;
             opacity: 0;
             transition: all 0.2s;
         }
 
         .tab:hover .tab-close, .tab.active .tab-close {
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         .tab-close:hover {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1);
             opacity: 1 !important;
-            color: #ff4d4d;
         }
 
         .nav-bar {
-            height: 48px;
+            height: 42px;
             background: var(--bg-ui);
             display: flex;
             align-items: center;
-            padding: 0 16px;
-            gap: 16px;
+            padding: 0 12px;
+            gap: 12px;
             border-bottom: 1px solid var(--border);
         }
 
         .nav-btn {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
+            border-radius: 6px;
             color: #666;
-            transition: all 0.2s;
+            transition: all 0.15s;
         }
 
         .nav-btn:hover {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.06);
             color: #fff;
         }
 
@@ -177,25 +168,25 @@
 
         .address-bar {
             width: 100%;
-            height: 32px;
+            height: 28px;
             background: #000;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 0 40px;
-            color: #eee;
-            font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 6px;
+            padding: 0 36px;
+            color: #ddd;
+            font-size: 12px;
             font-family: 'JetBrains Mono', monospace;
             outline: none;
             transition: border-color 0.2s;
         }
 
         .address-bar:focus {
-            border-color: #555;
+            border-color: #333;
         }
 
         .address-icon {
             position: absolute;
-            left: 12px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
             color: #444;
@@ -220,21 +211,19 @@
         }
 
         #add-tab-btn {
-            width: 32px;
-            height: 32px;
-            margin-bottom: 6px;
-            margin-left: 6px;
+            width: 28px;
+            height: 28px;
+            margin-bottom: 4px;
+            margin-left: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
+            border-radius: 6px;
             color: #444;
             transition: all 0.2s;
         }
         #add-tab-btn:hover {
-            background: rgba(255,255,255,0.08);
             color: #fff;
-            transform: rotate(90deg);
         }
     </style>
 </head>
@@ -242,19 +231,19 @@
     <div class="tab-bar">
         <div class="tabs-list" id="tabs-list"></div>
         <button id="add-tab-btn">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         </button>
     </div>
 
     <div class="nav-bar">
         <div class="flex gap-1">
-            <button class="nav-btn" id="back-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-            <button class="nav-btn" id="forward-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
-            <button class="nav-btn" id="refresh-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+            <button class="nav-btn" id="back-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <button class="nav-btn" id="forward-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+            <button class="nav-btn" id="refresh-btn"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
         </div>
 
         <div class="address-bar-container">
-            <div class="address-icon"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
+            <div class="address-icon"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
             <input type="text" class="address-bar" id="address-input" placeholder="Vision Search">
         </div>
     </div>
@@ -292,14 +281,10 @@
         function getEmbedUrl(input) {
             const val = input.trim();
             if (!val) return 'newtab.html';
-
             const isDomain = val.includes('.') && !val.includes(' ');
-            
             if (isDomain) {
                 let url = val;
-                if (!url.startsWith('http')) {
-                    url = 'https://' + url;
-                }
+                if (!url.startsWith('http')) url = 'https://' + url;
                 return `/active/embed.html?url=${url}`;
             } else {
                 return `/active/embed.html?url=https://www.google.com/search?q=${encodeURIComponent(val)}`;
@@ -312,38 +297,32 @@
                 id,
                 url,
                 title,
-                favicon: url === 'newtab.html' ? FAVICON_SERVICE + 'vision.inc' : FAVICON_SERVICE + extractDomain(url)
+                favicon: url === 'newtab.html' ? FAVICON_SERVICE + 'google.com' : FAVICON_SERVICE + extractDomain(url)
             };
             tabs.push(tab);
-            
             const iframe = document.createElement('iframe');
             iframe.id = `iframe-${id}`;
             iframe.className = 'webview';
             iframe.src = url;
             viewport.appendChild(iframe);
-
             setActiveTab(id);
         }
 
         function setActiveTab(id) {
             activeTabId = id;
             const currentTab = tabs.find(t => t.id === id);
-            
             document.querySelectorAll('.webview').forEach(ifrm => {
                 ifrm.classList.toggle('active', ifrm.id === `iframe-${id}`);
             });
-
             if (currentTab.url === 'newtab.html') {
                 addressInput.value = '';
             } else {
                 if (currentTab.url.includes('url=')) {
-                    const target = currentTab.url.split('url=')[1];
-                    addressInput.value = decodeURIComponent(target);
+                    addressInput.value = decodeURIComponent(currentTab.url.split('url=')[1]);
                 } else {
                     addressInput.value = currentTab.url;
                 }
             }
-
             renderTabs();
         }
 
@@ -357,11 +336,9 @@
                 setActiveTab(tab.id);
                 return;
             }
-
             const index = tabs.findIndex(t => t.id === id);
             tabs = tabs.filter(t => t.id !== id);
             document.getElementById(`iframe-${id}`).remove();
-
             if (activeTabId === id) {
                 const nextTab = tabs[index] || tabs[index - 1];
                 setActiveTab(nextTab.id);
@@ -388,7 +365,7 @@
 
                 const close = document.createElement('div');
                 close.className = 'tab-close';
-                close.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+                close.innerHTML = `<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
                 close.onclick = (e) => closeTab(tab.id, e);
 
                 tabEl.appendChild(icon);
@@ -402,11 +379,9 @@
             if (e.key === 'Enter') {
                 const url = getEmbedUrl(addressInput.value);
                 const currentTab = tabs.find(t => t.id === activeTabId);
-                
                 currentTab.url = url;
-                currentTab.title = addressInput.value.trim() || 'Vision Page';
+                currentTab.title = addressInput.value.trim() || 'Vision';
                 currentTab.favicon = FAVICON_SERVICE + extractDomain(url);
-                
                 document.getElementById(`iframe-${activeTabId}`).src = url;
                 renderTabs();
                 addressInput.blur();
