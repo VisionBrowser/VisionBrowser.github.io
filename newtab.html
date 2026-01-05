@@ -21,7 +21,7 @@
         }
         .container {
             text-align: center;
-            max-width: 280px; /* Shortened search bar as requested */
+            max-width: 240px; /* MUCH SHORTER NOW */
             width: 90%;
             z-index: 10;
         }
@@ -29,50 +29,52 @@
             font-size: 5rem;
             font-weight: 800;
             letter-spacing: -4px;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             opacity: 0.9;
         }
-        .search-input {
+        .search-pill {
             width: 100%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 30px;
-            background: rgba(20, 20, 20, 0.8);
-            backdrop-filter: blur(20px);
+            height: 38px;
+            background: #0a0a0a; /* Dark pill as requested */
             border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 40px;
             color: #fff;
-            font-size: 0.95rem;
+            font-size: 13px;
             outline: none;
             transition: all 0.3s;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
         }
-        .search-input:focus {
+        .search-pill::placeholder {
+            color: #555;
+        }
+        .search-pill:focus {
             background: #000;
             border-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
+            transform: scale(1.02);
         }
         .appearance-btn {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
             font-size: 10px;
-            color: #444;
+            color: #333;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
             transition: color 0.2s;
         }
-        .appearance-btn:hover { color: #888; }
+        .appearance-btn:hover { color: #666; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="clock" id="clock">00:00</div>
-        <input type="text" class="search-input" id="search" placeholder="Search Vision" autocomplete="off">
+        <input type="text" class="search-pill" id="search" placeholder="Search Vision" autocomplete="off" spellcheck="false">
     </div>
 
     <input type="file" id="bg-upload" style="display:none" accept="image/*">
-    <div class="appearance-btn" onclick="document.getElementById('bg-upload').click()">Customize Appearance</div>
+    <div class="appearance-btn" onclick="document.getElementById('bg-upload').click()">Customize View</div>
 
     <script>
         function updateClock() {
