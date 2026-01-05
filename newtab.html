@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Tab</title>
+    <title>Start</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -18,77 +18,139 @@
             overflow: hidden;
             background-size: cover;
             background-position: center;
+            transition: background 0.5s ease;
         }
-        .container {
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-wrap {
             text-align: center;
-            max-width: 450px;
-            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             z-index: 10;
         }
+
         .clock {
-            font-size: 5rem;
-            font-weight: 800;
-            letter-spacing: -4px;
-            margin-bottom: 2.5rem;
-            opacity: 0.9;
+            font-size: 6.5rem;
+            font-weight: 900;
+            letter-spacing: -6px;
+            margin-bottom: 1.5rem;
+            opacity: 0.85;
+            user-select: none;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .search-pill {
+
+        .search-container {
+            position: relative;
+            width: 340px; /* Adjusted to be slightly longer but still compact */
+            transition: width 0.3s ease;
+        }
+
+        .search-input {
             width: 100%;
-            height: 48px;
+            height: 44px;
             background: #121212;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 22px;
             color: #fff;
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 0 24px;
-            text-align: left;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            padding: 0 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
-        .search-pill::placeholder {
-            color: #555;
-        }
-        .search-pill:focus, .search-pill:hover {
-            background: #1a1a1a;
-            border-color: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 40px rgba(0,0,0,0.8);
-        }
-        .appearance-btn {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            font-size: 10px;
+
+        .search-input::placeholder {
             color: #444;
+            transition: opacity 0.2s;
+        }
+
+        .search-input:focus {
+            width: 380px; 
+            border-color: rgba(255, 255, 255, 0.15);
+            background: #181818;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+        }
+
+        .search-input:focus::placeholder {
+            opacity: 0;
+        }
+
+        .footer-controls {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .control-btn {
+            font-size: 10px;
+            color: #333;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
         }
-        .appearance-btn:hover { color: #888; }
+
+        .control-btn:hover { 
+            color: #777; 
+            background: rgba(255,255,255,0.03);
+        }
+
+        @media (max-width: 600px) {
+            .clock { font-size: 4rem; letter-spacing: -3px; }
+            .search-container { width: 240px; }
+            .search-input:focus { width: 280px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="content-wrap">
         <div class="clock" id="clock">00:00</div>
-        <input type="text" class="search-pill" id="search" placeholder="Search Vision" autocomplete="off" spellcheck="false">
+        <div class="search-container">
+            <input type="text" class="search-input" id="search" placeholder="Vision Search" autocomplete="off" spellcheck="false">
+        </div>
     </div>
 
     <input type="file" id="bg-upload" style="display:none" accept="image/*">
-    <div class="appearance-btn" onclick="document.getElementById('bg-upload').click()">Customize View</div>
+    <div class="footer-controls">
+        <button class="control-btn" onclick="document.getElementById('bg-upload').click()">Customize</button>
+    </div>
 
     <script>
         function updateClock() {
             const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            document.getElementById('clock').textContent = time;
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        const search = document.getElementById('search');
-        search.onkeydown = (e) => {
-            if (e.key === 'Enter' && search.value.trim()) {
-                window.parent.postMessage({ type: 'navigate', query: search.value.trim() }, '*');
+        const searchInput = document.getElementById('search');
+        searchInput.onkeydown = (e) => {
+            if (e.key === 'Enter' && searchInput.value.trim()) {
+                window.parent.postMessage({ 
+                    type: 'navigate', 
+                    query: searchInput.value.trim() 
+                }, '*');
             }
         };
 
@@ -99,16 +161,18 @@
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     document.body.style.backgroundImage = `url(${ev.target.result})`;
-                    localStorage.setItem('vision_bg', ev.target.result);
+                    localStorage.setItem('vision_start_bg', ev.target.result);
                 };
                 reader.readAsDataURL(file);
             }
         };
 
-        const savedBg = localStorage.getItem('vision_bg');
-        if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
+        const savedBg = localStorage.getItem('vision_start_bg');
+        if (savedBg) {
+            document.body.style.backgroundImage = `url(${savedBg})`;
+        }
 
-        window.parent.postMessage({ type: 'meta-update', title: 'New Tab' }, '*');
+        window.parent.postMessage({ type: 'meta-update', title: 'Start' }, '*');
     </script>
 </body>
 </html>
