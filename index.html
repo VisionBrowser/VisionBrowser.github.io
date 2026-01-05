@@ -235,16 +235,16 @@
         const closeSidePanel = document.getElementById('close-side-panel');
         const zoomDisplay = document.getElementById('zoom-display');
 
-        // CORS Proxy Fetch Helper - Fixes "Failed to fetch" errors for metadata
+        // CORS Proxy Fetch Helper - Wrapped to prevent TypeError: Failed to fetch
         async function corsProxyFetch(url) {
             try {
-                if (!url.startsWith('http')) return null;
+                if (!url || typeof url !== 'string' || !url.startsWith('http')) return null;
                 const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('Proxy failed');
+                const response = await fetch(proxyUrl).catch(() => null);
+                if (!response || !response.ok) return null;
                 return await response.json();
             } catch (e) {
-                console.warn('CORS Proxy metadata fetch skipped for:', url);
+                console.warn('Metadata fetch failed gracefully:', e);
                 return null;
             }
         }
@@ -411,27 +411,45 @@
         function navigate(input) {
             if (!input) return;
             input = input.trim();
-            const searchBase = 'https://www.google.com/search?q=';
-            let targetUrl = '';
             const internalPages = ['history.html', 'bookmarks.html', 'newtab.html', 'devtools.html', 'settings.html', 'music.html', 'ai.html'];
             
             if (internalPages.includes(input)) {
-                targetUrl = input;
+                if (activeTabId) {
+                    updateTab(activeTabId, { url: input, proxyUrl: input, title: input, favicon: null });
+                }
+                return;
+            }
+
+            let finalProxyUrl = '';
+            const isProtocol = /^https?:\/\//i.test(input);
+            const isDomain = !input.includes(' ') && input.includes('.') && input.length > 3;
+
+            if (isProtocol) {
+                // User added https:// already, don't double up
+                finalProxyUrl = 'active/embed.html?url=' + input;
+            } else if (isDomain) {
+                // Domain input, prepend https://
+                finalProxyUrl = 'active/embed.html?url=https://' + input;
             } else {
-                const isProtocol = /^https?:\/\//i.test(input);
-                const isDomain = !input.includes(' ') && input.includes('.') && input.length > 3;
-                if (isProtocol) targetUrl = input;
-                else if (isDomain) targetUrl = 'https://' + input;
-                else targetUrl = searchBase + encodeURIComponent(input);
+                // Search query
+                finalProxyUrl = 'active/embed.html?url=https://www.google.com/search?q=' + encodeURIComponent(input);
             }
             
-            // Consolidate to the unified active/embed.html gateway
-            const finalProxyUrl = internalPages.includes(targetUrl) ? targetUrl : 'active/embed.html?url=' + encodeURIComponent(targetUrl);
-            saveHistory(targetUrl, input);
+            saveHistory(input, input);
             
             if (activeTabId) {
-                updateTab(activeTabId, { url: input, proxyUrl: finalProxyUrl, title: input, favicon: getFavicon(finalProxyUrl) });
-                fetchPageMetadata(activeTabId, targetUrl);
+                const iconBase = isProtocol ? input : (isDomain ? 'https://' + input : 'https://www.google.com');
+                updateTab(activeTabId, { 
+                    url: input, 
+                    proxyUrl: finalProxyUrl, 
+                    title: input, 
+                    favicon: getFavicon(iconBase) 
+                });
+                
+                // For external sites, attempt metadata fetch
+                if (isProtocol || isDomain) {
+                    fetchPageMetadata(activeTabId, isProtocol ? input : 'https://' + input);
+                }
             }
             menuDropdown.classList.add('hidden');
         }
