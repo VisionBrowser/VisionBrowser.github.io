@@ -14,19 +14,19 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
             overflow: hidden;
             background-size: cover;
             background-position: center;
         }
         .container {
             text-align: center;
-            max-width: 600px;
+            max-width: 400px; /* Reduced as requested */
             width: 90%;
             z-index: 10;
         }
         .clock {
-            font-size: 6rem;
+            font-size: 5rem;
             font-weight: 800;
             letter-spacing: -4px;
             margin-bottom: 2rem;
@@ -34,44 +34,45 @@
         }
         .search-input {
             width: 100%;
-            padding: 1.2rem 2rem;
-            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            border-radius: 30px;
             background: rgba(20, 20, 20, 0.8);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1rem;
             outline: none;
             transition: all 0.3s;
             text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
         .search-input:focus {
             background: #000;
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .wallpaper-trigger {
+        .appearance-btn {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            font-size: 11px;
+            font-size: 10px;
             color: #444;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
+            transition: color 0.2s;
         }
-        .wallpaper-trigger:hover { color: #888; }
+        .appearance-btn:hover { color: #888; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="clock" id="clock">00:00</div>
-        <input type="text" class="search-input" id="search" placeholder="Search with Vision" autocomplete="off">
+        <input type="text" class="search-input" id="search" placeholder="Explore with Vision" autocomplete="off">
     </div>
 
     <input type="file" id="bg-upload" style="display:none" accept="image/*">
-    <div class="wallpaper-trigger" onclick="document.getElementById('bg-upload').click()">Change Appearance</div>
+    <div class="appearance-btn" onclick="document.getElementById('bg-upload').click()">Customize Appearance</div>
 
     <script>
         function updateClock() {
@@ -104,8 +105,8 @@
         const savedBg = localStorage.getItem('vision_bg');
         if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
 
-        
-        window.parent.postMessage({ type: 'update-meta', title: 'New Tab' }, '*');
+     
+        window.parent.postMessage({ type: 'meta-update', title: 'New Tab' }, '*');
     </script>
 </body>
 </html>
