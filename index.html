@@ -3,77 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vision Browser</title>
+    <title>Vision</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --bg: #050505;
-            --nav-bg: #111111;
-            --tab-active: #111111;
-            --tab-inactive: transparent;
-            --text-main: #eeeeee;
-            --text-dim: #666666;
-            --border: rgba(255, 255, 255, 0.08);
-            --radius: 12px;
+            --bg: #000000;
+            --nav-bg: #0d0d0d;
+            --tab-active: #0d0d0d;
+            --text-main: #ffffff;
+            --text-dim: #555555;
+            --border: rgba(255, 255, 255, 0.04);
         }
 
         body {
             background-color: var(--bg);
             color: var(--text-main);
             margin: 0;
-            padding: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
         }
 
-        /* --- Tabs Logic --- */
+        /* --- Tabs --- */
         .tab-strip {
             display: flex;
             align-items: flex-end;
-            padding-left: 12px;
-            padding-top: 8px;
-            height: 40px;
+            padding-left: 8px;
+            padding-top: 6px;
+            height: 38px;
             background: var(--bg);
-            z-index: 10;
+            z-index: 20;
         }
 
         .tabs-container {
             display: flex;
             align-items: flex-end;
             gap: 0;
-            overflow-x: auto;
-            scrollbar-width: none;
         }
-        .tabs-container::-webkit-scrollbar { display: none; }
 
         .tab {
             position: relative;
             height: 32px;
-            min-width: 140px;
-            max-width: 200px;
-            padding: 0 16px;
+            width: 180px;
+            padding: 0 12px;
             display: flex;
             align-items: center;
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 500;
             color: var(--text-dim);
             cursor: pointer;
             user-select: none;
             transition: color 0.2s;
-            border-radius: 8px 8px 0 0;
+            border-radius: 10px 10px 0 0;
         }
 
-        .tab:hover { color: #fff; }
+        .tab:hover { color: #888; }
 
         .tab.active {
             background: var(--tab-active);
             color: #fff;
-            z-index: 2;
+            z-index: 5;
         }
 
-        /* The requested mask-image inverted radius corners */
+        /* Inverted Radius using mask-image */
         .tab.active::before,
         .tab.active::after {
             content: "";
@@ -87,22 +81,22 @@
 
         .tab.active::before {
             left: -16px;
-            -webkit-mask-image: radial-gradient(circle at 0 0, transparent 16px, black 16px);
             mask-image: radial-gradient(circle at 0 0, transparent 16px, black 16px);
+            -webkit-mask-image: radial-gradient(circle at 0 0, transparent 16px, black 16px);
         }
 
         .tab.active::after {
             right: -16px;
-            -webkit-mask-image: radial-gradient(circle at 100% 0, transparent 16px, black 16px);
             mask-image: radial-gradient(circle at 100% 0, transparent 16px, black 16px);
+            -webkit-mask-image: radial-gradient(circle at 100% 0, transparent 16px, black 16px);
         }
 
         .tab-favicon {
             width: 14px;
             height: 14px;
             margin-right: 8px;
+            border-radius: 3px;
             flex-shrink: 0;
-            border-radius: 2px;
         }
 
         .tab-text {
@@ -113,7 +107,7 @@
         }
 
         .tab-close {
-            margin-left: 8px;
+            margin-left: 6px;
             width: 16px;
             height: 16px;
             border-radius: 4px;
@@ -121,81 +115,85 @@
             align-items: center;
             justify-content: center;
             opacity: 0;
-            transition: opacity 0.2s, background 0.2s;
+            transition: all 0.2s;
         }
 
-        .tab:hover .tab-close { opacity: 0.6; }
-        .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+        .tab:hover .tab-close, .tab.active .tab-close { opacity: 0.5; }
+        .tab-close:hover { opacity: 1 !important; background: rgba(255,255,255,0.1); }
 
-        /* --- Navigation Pill --- */
+        /* --- Nav Bar --- */
         .nav-bar {
             background: var(--nav-bg);
-            height: 48px;
+            height: 44px;
             display: flex;
             align-items: center;
             padding: 0 12px;
-            gap: 12px;
             border-bottom: 1px solid var(--border);
             position: relative;
-            z-index: 5;
+            z-index: 10;
         }
 
-        .nav-tools {
+        .nav-controls {
             display: flex;
             gap: 4px;
+            margin-right: 12px;
         }
 
-        .tool-btn {
-            width: 32px;
-            height: 32px;
+        .nav-btn {
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 6px;
-            color: var(--text-dim);
+            color: #444;
             transition: all 0.2s;
         }
 
-        .tool-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
 
-        .address-container {
-            flex: 1;
+        .address-box {
             position: relative;
-            max-width: 800px;
+            width: 460px; /* Reduced length as requested */
             margin: 0 auto;
         }
 
         .address-bar {
             width: 100%;
-            height: 32px;
-            background: #000;
+            height: 28px;
+            background: #050505;
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 0 16px 0 36px;
-            font-size: 13px;
-            color: #ccc;
+            border-radius: 14px;
+            padding: 0 32px;
+            font-size: 12px;
+            color: #999;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
+            text-align: center;
         }
 
-        .address-bar:focus { border-color: #444; color: #fff; }
+        .address-bar:focus {
+            border-color: #333;
+            color: #fff;
+            background: #000;
+        }
 
         .address-icon {
             position: absolute;
-            left: 12px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            color: #444;
+            color: #333;
         }
 
         /* --- Viewport --- */
-        .browser-viewport {
+        .viewport {
             flex: 1;
             position: relative;
             background: #000;
         }
 
-        .web-frame {
+        .webview {
             position: absolute;
             top: 0;
             left: 0;
@@ -205,123 +203,107 @@
             display: none;
         }
 
-        .web-frame.active { display: block; }
+        .webview.active { display: block; }
 
-        #btn-add-tab {
-            width: 28px;
-            height: 28px;
+        #add-tab {
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
-            color: #333;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             margin-left: 8px;
+            color: #333;
+            border-radius: 4px;
             transition: all 0.2s;
         }
-        #btn-add-tab:hover { background: rgba(255,255,255,0.05); color: #888; }
+        #add-tab:hover { color: #fff; background: rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
 
     <div class="tab-strip">
-        <div class="tabs-container" id="tabs-container">
-            <!-- Tabs injected here -->
-        </div>
-        <button id="btn-add-tab">
+        <div class="tabs-container" id="tabs-container"></div>
+        <button id="add-tab">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
         </button>
     </div>
 
     <div class="nav-bar">
-        <div class="nav-tools">
-            <button class="tool-btn" id="go-back"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-            <button class="tool-btn" id="go-forward"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
-            <button class="tool-btn" id="reload"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+        <div class="nav-controls">
+            <button class="nav-btn" id="back"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <button class="nav-btn" id="forward"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+            <button class="nav-btn" id="reload"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
         </div>
 
-        <div class="address-container">
+        <div class="address-box">
             <div class="address-icon">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             </div>
-            <input type="text" id="address-input" class="address-bar" placeholder="Search or enter URL" spellcheck="false" autocomplete="off">
+            <input type="text" id="address-input" class="address-bar" placeholder="Vision Search" autocomplete="off" spellcheck="false">
         </div>
-        
-        <div style="width: 100px;"></div> <!-- Spacer -->
+
+        <div style="width: 100px;"></div>
     </div>
 
-    <div class="browser-viewport" id="viewport">
-        <!-- Iframes injected here -->
-    </div>
+    <div class="viewport" id="viewport"></div>
 
     <script>
         const tabsContainer = document.getElementById('tabs-container');
         const viewport = document.getElementById('viewport');
         const addressInput = document.getElementById('address-input');
-        const addTabBtn = document.getElementById('btn-add-tab');
+        const addTabBtn = document.getElementById('add-tab');
 
         let tabs = [];
         let activeTabId = null;
 
         const FAVICON_SERVICE = 'https://www.google.com/s2/favicons?sz=64&domain=';
 
-        function createId() { return Math.random().toString(36).substring(2, 11); }
+        function createId() { return Math.random().toString(36).substr(2, 9); }
 
         function resolveUrl(input) {
             const val = input.trim();
             if (!val) return 'newtab.html';
 
-            // Simple URL detection: contains a dot, no spaces
-            const isPotentialUrl = val.includes('.') && !val.includes(' ');
-
-            if (isPotentialUrl) {
-                let cleanUrl = val;
-                // Enforce HTTPS logic
-                if (cleanUrl.startsWith('http://')) {
-                    cleanUrl = 'https://' + cleanUrl.slice(7);
-                } else if (!cleanUrl.startsWith('https://')) {
-                    cleanUrl = 'https://' + cleanUrl;
-                }
-                // Custom embedding method
-                return `/active/embed.html?url=${cleanUrl}`;
+            if (val.startsWith('https://')) {
+                return `/active/embed.html?url=${val}`;
+            } else if (val.includes('.') && !val.includes(' ')) {
+                // If it's a domain, add https:// and wrap in embed
+                return `/active/embed.html?url=https://${val}`;
             } else {
-                // Search query
+                // If it's a query, use Google search logic
                 return `/active/embed.html?url=https://www.google.com/search?q=${encodeURIComponent(val)}`;
             }
         }
 
-        function getDisplayUrl(rawUrl) {
-            if (rawUrl === 'newtab.html') return '';
-            if (rawUrl.includes('url=https://')) {
-                return decodeURIComponent(rawUrl.split('url=https://')[1]);
+        function getDisplayUrl(url) {
+            if (url === 'newtab.html') return '';
+            if (url.includes('url=https://')) {
+                return decodeURIComponent(url.split('url=https://')[1]);
             }
-            return rawUrl;
+            return url;
         }
 
         function extractDomain(url) {
             try {
-                const search = new URLSearchParams(url.split('?')[1]);
-                const target = search.get('url') || url;
+                const target = url.includes('url=') ? decodeURIComponent(url.split('url=')[1]) : url;
                 return new URL(target).hostname;
-            } catch(e) { return 'google.com'; }
+            } catch (e) { return 'google.com'; }
         }
 
         function addTab(url = 'newtab.html', title = 'New Tab') {
             const id = createId();
-            const tabObj = {
-                id,
-                url,
-                title,
+            const tab = {
+                id, url, title,
                 favicon: url === 'newtab.html' ? FAVICON_SERVICE + 'google.com' : FAVICON_SERVICE + extractDomain(url)
             };
-            
-            tabs.push(tabObj);
+            tabs.push(tab);
 
-            const frame = document.createElement('iframe');
-            frame.id = `frame-${id}`;
-            frame.className = 'web-frame';
-            frame.src = url;
-            viewport.appendChild(frame);
+            const iframe = document.createElement('iframe');
+            iframe.id = `iframe-${id}`;
+            iframe.className = 'webview';
+            iframe.src = url;
+            viewport.appendChild(iframe);
 
             setActiveTab(id);
         }
@@ -330,12 +312,7 @@
             activeTabId = id;
             const currentTab = tabs.find(t => t.id === id);
             
-            // Toggle frames
-            document.querySelectorAll('.web-frame').forEach(f => {
-                f.classList.toggle('active', f.id === `frame-${id}`);
-            });
-
-            // Update address bar
+            document.querySelectorAll('.webview').forEach(f => f.classList.toggle('active', f.id === `iframe-${id}`));
             addressInput.value = getDisplayUrl(currentTab.url);
             
             renderTabs();
@@ -344,39 +321,33 @@
         function closeTab(id, e) {
             if (e) e.stopPropagation();
             if (tabs.length === 1) {
-                // If last tab, just reset to newtab
                 const t = tabs[0];
                 t.url = 'newtab.html';
                 t.title = 'New Tab';
-                document.getElementById(`frame-${t.id}`).src = 'newtab.html';
+                document.getElementById(`iframe-${t.id}`).src = 'newtab.html';
                 setActiveTab(t.id);
                 return;
             }
 
             const idx = tabs.findIndex(t => t.id === id);
             tabs = tabs.filter(t => t.id !== id);
-            const frame = document.getElementById(`frame-${id}`);
-            if (frame) frame.remove();
+            document.getElementById(`iframe-${id}`).remove();
 
-            if (activeTabId === id) {
-                const nextTab = tabs[idx] || tabs[idx - 1];
-                setActiveTab(nextTab.id);
-            } else {
-                renderTabs();
-            }
+            if (activeTabId === id) setActiveTab(tabs[idx] ? tabs[idx].id : tabs[idx - 1].id);
+            else renderTabs();
         }
 
         function renderTabs() {
             tabsContainer.innerHTML = '';
             tabs.forEach(tab => {
-                const tabEl = document.createElement('div');
-                tabEl.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
-                tabEl.onclick = () => setActiveTab(tab.id);
+                const el = document.createElement('div');
+                el.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
+                el.onclick = () => setActiveTab(tab.id);
 
-                const fav = document.createElement('img');
-                fav.className = 'tab-favicon';
-                fav.src = tab.favicon;
-                fav.onerror = () => fav.src = FAVICON_SERVICE + 'google.com';
+                const icon = document.createElement('img');
+                icon.className = 'tab-favicon';
+                icon.src = tab.favicon;
+                icon.onerror = () => icon.src = FAVICON_SERVICE + 'google.com';
 
                 const text = document.createElement('span');
                 text.className = 'tab-text';
@@ -387,26 +358,23 @@
                 close.innerHTML = '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>';
                 close.onclick = (e) => closeTab(tab.id, e);
 
-                tabEl.appendChild(fav);
-                tabEl.appendChild(text);
-                tabEl.appendChild(close);
-                tabsContainer.appendChild(tabEl);
+                el.appendChild(icon);
+                el.appendChild(text);
+                el.appendChild(close);
+                tabsContainer.appendChild(el);
             });
         }
 
         addressInput.onkeydown = (e) => {
             if (e.key === 'Enter') {
-                const input = addressInput.value;
-                const resolved = resolveUrl(input);
+                const resolved = resolveUrl(addressInput.value);
                 const currentTab = tabs.find(t => t.id === activeTabId);
                 
                 currentTab.url = resolved;
                 currentTab.title = getDisplayUrl(resolved) || 'Loading...';
                 currentTab.favicon = FAVICON_SERVICE + extractDomain(resolved);
                 
-                const frame = document.getElementById(`frame-${activeTabId}`);
-                frame.src = resolved;
-                
+                document.getElementById(`iframe-${activeTabId}`).src = resolved;
                 renderTabs();
                 addressInput.blur();
             }
@@ -414,30 +382,31 @@
 
         addTabBtn.onclick = () => addTab();
 
-        // Listen for internal site navigation messages to update UI
         window.addEventListener('message', (e) => {
             if (e.data && e.data.type === 'navigate') {
                 addressInput.value = e.data.query;
-                const enterEv = new KeyboardEvent('keydown', { key: 'Enter' });
-                addressInput.onkeydown(enterEv);
+                const ev = new KeyboardEvent('keydown', { key: 'Enter' });
+                addressInput.onkeydown(ev);
             }
-            if (e.data && e.data.type === 'update-meta') {
-                const currentTab = tabs.find(t => t.id === activeTabId);
-                if (currentTab) {
-                    currentTab.title = e.data.title || currentTab.title;
+            if (e.data && e.data.type === 'meta-update') {
+                const t = tabs.find(x => x.id === activeTabId);
+                if (t) {
+                    t.title = e.data.title || t.title;
+                    if (e.data.url) t.url = e.data.url;
                     renderTabs();
+                    if (activeTabId === t.id) addressInput.value = getDisplayUrl(t.url);
                 }
             }
         });
 
-        // Init
+        // Init first tab
         addTab();
 
-        // Controls
-        document.getElementById('go-back').onclick = () => document.getElementById(`frame-${activeTabId}`).contentWindow.history.back();
-        document.getElementById('go-forward').onclick = () => document.getElementById(`frame-${activeTabId}`).contentWindow.history.forward();
+        // Control handlers
+        document.getElementById('back').onclick = () => document.getElementById(`iframe-${activeTabId}`).contentWindow.history.back();
+        document.getElementById('forward').onclick = () => document.getElementById(`iframe-${activeTabId}`).contentWindow.history.forward();
         document.getElementById('reload').onclick = () => {
-            const f = document.getElementById(`frame-${activeTabId}`);
+            const f = document.getElementById(`iframe-${activeTabId}`);
             f.src = f.src;
         };
     </script>
