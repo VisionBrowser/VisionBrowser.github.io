@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Arcade</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #e1e1e1;
+            color: #323232;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            user-select: none;
+            transition: background 0.3s;
+        }
+
+        /* Switch Dark Mode - Standard for Vision */
+        body.dark {
+            background: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .switch-header {
+            padding: 2rem 4rem 1rem 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #00c3e3;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .system-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #888;
+        }
+
+        .game-shelf {
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            padding: 2rem 4rem;
+            gap: 12px;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+            flex: 1;
+        }
+
+        .game-shelf::-webkit-scrollbar { display: none; }
+
+        .game-card {
+            min-width: 240px;
+            width: 240px;
+            aspect-ratio: 1/1;
+            background: #fff;
+            border-radius: 4px;
+            border: 4px solid transparent;
+            transition: all 0.15s ease-out;
+            position: relative;
+            cursor: pointer;
+            flex-shrink: 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        body.dark .game-card {
+            background: #3c3c3c;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .game-card.focused {
+            transform: scale(1.08);
+            border-color: #00c3e3;
+            box-shadow: 0 0 0 6px #fff, 0 20px 40px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        body.dark .game-card.focused {
+            box-shadow: 0 0 0 6px #2d2d2d, 0 25px 50px rgba(0,0,0,0.6);
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .game-title {
+            position: absolute;
+            top: -45px;
+            left: 0;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #323232;
+            opacity: 0;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+        body.dark .game-title { color: #fff; }
+
+        .game-card.focused .game-title {
+            opacity: 1;
+        }
+
+        .search-container {
+            padding: 0 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255,255,255,0.8);
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 700;
+            outline: none;
+            color: #333;
+        }
+        body.dark .search-bar {
+            background: #3c3c3c;
+            border-color: #444;
+            color: #fff;
+        }
+
+        .bottom-nav {
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        body.dark .bottom-nav { border-top-color: rgba(255,255,255,0.05); }
+
+        .nav-circle {
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        body.dark .nav-circle { background: #3c3c3c; color: #aaa; }
+        .nav-circle:hover { transform: translateY(-5px); background: #00c3e3; color: white; }
+
+        .instruction {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #888;
+            padding-bottom: 2rem;
+        }
+    </style>
+</head>
+<body class="dark">
+    <header class="switch-header">
+        <div class="profile-section">
+            <div class="profile-icon"></div>
+            <div class="font-black text-lg tracking-widest">VISION</div>
+        </div>
+        <div class="system-info">
+            <div id="clock">00:00</div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-bar" placeholder="Find software..." autocomplete="off">
+    </div>
+
+    <div id="game-grid" class="game-shelf no-scrollbar"></div>
+
+    <div class="instruction">
+        Navigate with Arrows or Mouse • Press 'A' to execute software • Click to launch
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-circle" title="Nintendo Online"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="nav-circle" title="News"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg></div>
+        <div class="nav-circle" title="eShop"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <div class="nav-circle" title="Album"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
+        <div class="nav-circle" title="Controllers"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m5-2h.01m2.99 0h.01"/></svg></div>
+        <div class="nav-circle" title="Settings"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+    </div>
+
+    <script>
+        const games = [
+            { title: "Cuphead", image: "images/cuphead.jpg", url: "https://example.com/cuphead" },
+            { title: "Hollow Knight", image: "images/hollowknight.jpg", url: "https://example.com/hollowknight" },
+            { title: "Pizza Tower", image: "images/pizzatower.jpg", url: "https://example.com/pizzatower" },
+            { title: "People Playground", image: "images/peopleplayground.jpg", url: "https://example.com/peopleplayground" },
+            { title: "Blood Money", image: "images/bloodmoney.jpg", url: "https://example.com/bloodmoney" },
+            { title: "Dice", image: "images/dice.jpg", url: "https://example.com/dice" },
+            { title: "Neon Shooter", image: "images/neonshooter.jpg", url: "https://example.com/neonshooter" },
+            { title: "Celeste", image: "https://devechox2.github.io/ArrowUBG/Images/celeste.jpeg", url: "https://example.com/celeste" }
+        ];
+
+        const grid = document.getElementById('game-grid');
+        const searchInput = document.getElementById('search-input');
+
+        function renderGames() {
+            grid.innerHTML = '';
+            const query = searchInput.value.toLowerCase();
+            const filtered = games.filter(g => g.title.toLowerCase().includes(query));
+
+            filtered.forEach((game, idx) => {
+                const card = document.createElement('div');
+                card.className = 'game-card' + (idx === 0 ? ' focused' : '');
+                card.setAttribute('data-url', game.url);
+                card.innerHTML = `
+                    <div class="game-title">${game.title}</div>
+                    <img src="${game.image}" alt="${game.title}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
+                `;
+                card.onclick = () => window.location.href = game.url;
+                grid.appendChild(card);
+            });
+        }
+
+        searchInput.oninput = renderGames;
+
+        window.onkeydown = (e) => {
+            if (document.activeElement === searchInput) return;
+
+            const cards = Array.from(document.querySelectorAll('.game-card'));
+            const focused = document.querySelector('.game-card.focused');
+            let idx = cards.indexOf(focused);
+
+            if (e.key === 'ArrowRight' && idx < cards.length - 1) {
+                focused.classList.remove('focused');
+                cards[idx + 1].classList.add('focused');
+                cards[idx + 1].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+            } else if (e.key === 'ArrowLeft' && idx > 0) {
+                focused.classList.remove('focused');
+                cards[idx - 1].classList.add('focused');
+                cards[idx - 1].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+            } else if (e.key.toLowerCase() === 'a' || e.key === 'Enter') {
+                if (focused) focused.click();
+            }
+        };
+
+        function updateClock() {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        renderGames();
+    </script>
+</body>
+</html>
