@@ -1,320 +1,123 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vision Start</title>
+    <title>Vision Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap');
-
+        :root {
+            --accent: #d1b8ff;
+        }
         body {
-            background-color: #000;
-            color: #fff;
-            margin: 0;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
             height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+            color: white;
+        }
+
+        .vision-card {
+            background: rgba(15, 15, 17, 0.4);
+            backdrop-filter: blur(40px);
+            width: 90%;
+            max-width: 640px;
+            padding: 100px 40px;
+            border-radius: 48px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            transition: background-image 1.2s cubic-bezier(0.1, 0.9, 0.2, 1);
-        }
-
-        .dim-overlay {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
-            z-index: -1;
-        }
-
-        .vision-widget {
-            background: rgba(8, 8, 8, 0.45);
-            backdrop-filter: blur(60px) saturate(200%);
-            -webkit-backdrop-filter: blur(60px) saturate(200%);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 60px;
-            padding: 3rem 6rem;
-            text-align: center;
-            margin-bottom: 3.5rem;
-            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.9), 0 0 50px rgba(124, 58, 237, 0.15);
-            position: relative;
-            animation: entryBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .vision-widget::after {
-            content: "";
-            position: absolute;
-            inset: -2px;
-            border-radius: 62px;
-            padding: 2px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent, rgba(124, 58, 237, 0.6));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-        }
-
-        .top-label {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 1.5rem;
-            font-weight: 900;
-        }
-
-        .clock-heavy {
-            font-size: 9rem;
-            font-weight: 900;
-            line-height: 0.9;
-            display: flex;
-            align-items: baseline;
-            justify-content: center;
-            gap: 1.5rem;
-            letter-spacing: -8px;
-            color: #fff;
-            text-shadow: 0 15px 40px rgba(0,0,0,0.4);
-        }
-
-        .ampm-suffix {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #8b5cf6;
-            letter-spacing: 0;
-            text-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
-        }
-
-        .search-container {
-            width: 540px;
-            position: relative;
-            animation: slideUpStrong 1s ease-out 0.3s backwards;
-        }
-
-        .search-bar {
-            width: 100%;
-            height: 72px;
-            background: rgba(12, 12, 12, 0.92);
-            backdrop-filter: blur(30px);
-            border: 2px solid rgba(255, 255, 255, 0.08);
-            border-radius: 36px;
-            padding: 0 80px;
-            color: #fff;
-            font-size: 20px;
-            font-weight: 700;
-            outline: none;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
-        }
-
-        .search-bar:focus {
-            background: #000;
-            border-color: #8b5cf6;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 35px rgba(139, 92, 246, 0.4);
-            transform: scale(1.04) translateY(-4px);
-        }
-
-        .search-bar::placeholder { color: #333; }
-
-        .google-logo {
-            position: absolute;
-            left: 28px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 26px;
-            height: 26px;
-        }
-
-        .mic-btn {
-            position: absolute;
-            right: 28px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #444;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .mic-btn:hover { color: #8b5cf6; transform: scale(1.1); }
-
-        .action-row {
-            display: flex;
-            justify-content: center;
             gap: 24px;
-            margin-top: 3rem;
-            animation: fadeIn 1s ease-out 0.6s backwards;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
         }
 
-        .btn-bold {
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px solid rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.4);
-            padding: 14px 40px;
-            border-radius: 20px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
+        .brand {
+            font-size: 8rem;
             font-weight: 900;
+            letter-spacing: -0.06em;
+            color: var(--accent);
+            margin-bottom: 20px;
+            line-height: 0.8;
+            transition: color 0.5s ease;
         }
 
-        .btn-bold:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-            border-color: #8b5cf6;
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
-        }
-
-        .preset-strip {
-            position: fixed;
-            bottom: 4rem;
-            left: 50%;
-            transform: translateX(-50%);
+        .search-box {
+            width: 100%;
+            max-width: 440px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 14px 28px;
             display: flex;
-            gap: 20px;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
+        .search-box:focus-within {
             background: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: all 0.4s;
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
-        .dot:hover { background: rgba(255, 255, 255, 0.4); transform: scale(1.6); }
-        .dot.active { 
-            background: #8b5cf6; 
-            box-shadow: 0 0 15px #8b5cf6; 
-            transform: scale(1.4); 
+        input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 700;
         }
 
-        @keyframes entryBounce {
-            from { opacity: 0; transform: scale(0.9) translateY(-60px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
+        input::placeholder { color: rgba(255,255,255,0.3); }
 
-        @keyframes slideUpStrong {
-            from { opacity: 0; transform: translateY(60px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .time {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="dim-overlay"></div>
-
-    <div class="vision-widget">
-        <div class="top-label" id="date-label">JANUARY 01 MONDAY</div>
-        <div class="clock-heavy">
-            <span id="time-val">00:00</span>
-            <span class="ampm-suffix" id="ampm-val">AM</span>
-        </div>
+    <div class="vision-card">
+        <h1 class="brand">Vision</h1>
+        <form id="search-form" class="search-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="opacity: 0.4"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input id="q" type="text" placeholder="Access deep network..." autocomplete="off">
+        </form>
+        <div id="clock" class="time">00:00:00</div>
     </div>
-
-    <div class="search-container">
-        <svg class="google-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        <input type="text" id="dash-input" class="search-bar" placeholder="Conquer the digital realm..." autocomplete="off">
-        <svg class="mic-btn" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
-    </div>
-
-    <div class="action-row">
-        <button class="btn-bold" onclick="document.getElementById('pick-wall').click()">Upload Swirl</button>
-        <button class="btn-bold" id="reset-btn">Reset Vision</button>
-    </div>
-
-    <div class="preset-strip" id="dot-strip"></div>
-
-    <input type="file" id="pick-wall" style="display:none" accept="image/*">
 
     <script>
-        const wallOptions = [
-            'https://raw.githubusercontent.com/AI-Studio-Community/Assets/main/swirl_ethereal.jpg',
-            'https://i.pinimg.com/originals/9f/6e/8f/9f6e8f498f39564c7280e55193967d71.gif',
-            'https://i.pinimg.com/originals/5c/4a/1b/5c4a1b8e4e60156d9595503038311054.gif',
-            'https://wallpaperaccess.com/full/333790.jpg'
-        ];
+        const clock = document.getElementById('clock');
+        function tick() { clock.textContent = new Date().toLocaleTimeString(); }
+        setInterval(tick, 1000); tick();
 
-        function tick() {
-            const now = new Date();
-            const h = now.getHours();
-            const m = now.getMinutes().toString().padStart(2, '0');
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            const dh = (h % 12 || 12).toString().padStart(2, '0');
-            
-            document.getElementById('time-val').textContent = `${dh}:${m}`;
-            document.getElementById('ampm-val').textContent = ampm;
-
-            const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-            const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-            document.getElementById('date-label').textContent = `${months[now.getMonth()]} ${now.getDate()} ${days[now.getDay()]}`;
+        function syncAccent() {
+            const acc = localStorage.getItem('vision_accent');
+            if (acc) document.documentElement.style.setProperty('--accent', acc);
         }
-        setInterval(tick, 1000);
-        tick();
+        syncAccent();
+        window.addEventListener('storage', syncAccent);
 
-        const inputField = document.getElementById('dash-input');
-        inputField.onkeydown = (e) => {
-            if (e.key === 'Enter' && inputField.value.trim()) {
-                window.parent.postMessage({ type: 'navigate', query: inputField.value.trim() }, '*');
-            }
+        document.getElementById('search-form').onsubmit = (e) => {
+            e.preventDefault();
+            const q = document.getElementById('q').value;
+            if (q) window.parent.postMessage({ type: 'navigate', query: q }, '*');
         };
-
-        const fileInput = document.getElementById('pick-wall');
-        fileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => applyWallpaper(ev.target.result);
-                reader.readAsDataURL(file);
-            }
-        };
-
-        function applyWallpaper(url) {
-            document.body.style.backgroundImage = `url("${url}")`;
-            localStorage.setItem('vision_custom_bg', url);
-            updateDotStatus(url);
-        }
-
-        function updateDotStatus(url) {
-            document.querySelectorAll('.dot').forEach(d => d.classList.toggle('active', d.dataset.url === url));
-        }
-
-        const dotStrip = document.getElementById('dot-strip');
-        wallOptions.forEach(url => {
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            dot.dataset.url = url;
-            dot.onclick = () => applyWallpaper(url);
-            dotStrip.appendChild(dot);
-        });
-
-        document.getElementById('reset-btn').onclick = () => {
-            if (confirm('Reboot Vision system and clear custom wallpaper?')) {
-                localStorage.removeItem('vision_custom_bg');
-                window.location.reload();
-            }
-        };
-
-        const storedWall = localStorage.getItem('vision_custom_bg');
-        applyWallpaper(storedWall || wallOptions[0]);
-
-        window.parent.postMessage({ type: 'meta-update', title: 'New Tab' }, '*');
     </script>
 </body>
 </html>
