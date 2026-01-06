@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +16,6 @@
                 })
             }
         }
-
         sw()
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -62,7 +60,7 @@
             height: 40px;
             min-width: 160px;
             max-width: 240px;
-            padding: 0 16px;
+            padding: 0 12px 0 16px;
             display: flex;
             align-items: center;
             font-size: 11px;
@@ -90,6 +88,27 @@
             border-top: 2px solid var(--accent);
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
             z-index: 10;
+        }
+
+        .close-tab-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 6px;
+            margin-left: 8px;
+            opacity: 0;
+            transition: all 0.2s;
+            color: currentColor;
+        }
+        .tab:hover .close-tab-btn {
+            opacity: 0.5;
+        }
+        .close-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 1 !important;
+            color: #ef4444;
         }
 
         .tool-btn { 
@@ -268,19 +287,23 @@
     </div>
 
     <script type="module">
-        const connection = new BareMux.BareMuxConnection("/bm/worker.js")
-        connection.setTransport("/lc/index.mjs", [{ websocket: localStorage.getItem("vision_wispUrl") ?? "wss://wisp.rhw.one/" }])
-
-        const { ScramjetController } = $scramjetLoadController()
-
-        const scramjet = new ScramjetController({
-            files: {
-                wasm: "/sj/scramjet.wasm",
-                sync: "/sj/scramjet.sync.js",
-                all: "/sj/scramjet.all.js"
+        // Safe Proxy Initialization
+        let scramjet = null;
+        try {
+            if (typeof BareMux !== 'undefined') {
+                const connection = new BareMux.BareMuxConnection("/bm/worker.js")
+                connection.setTransport("/lc/index.mjs", [{ websocket: localStorage.getItem("vision_wispUrl") ?? "wss://wisp.rhw.one/" }])
             }
-        })
-        scramjet.init()
+            if (typeof $scramjetLoadController === 'function') {
+                const { ScramjetController } = $scramjetLoadController()
+                scramjet = new ScramjetController({
+                    files: { wasm: "/sj/scramjet.wasm", sync: "/sj/scramjet.sync.js", all: "/sj/scramjet.all.js" }
+                })
+                scramjet.init()
+            }
+        } catch (e) {
+            console.error("[VISION] Proxy subsystem error (ignored):", e);
+        }
 
         class VisionEngine {
             constructor() {
@@ -342,6 +365,10 @@
                 window.onmessage = (e) => {
                     if (e.data.type === 'navigate') this.navigate(e.data.query);
                     if (e.data.type === 'update-settings') this.loadAesthetics();
+                    if (e.data.type === 'request-current-tab' && this.activeTabId) {
+                        const active = this.tabs.find(t => t.id === this.activeTabId);
+                        if (active) e.source.postMessage({ type: 'response-current-tab', url: active.url, title: active.title }, '*');
+                    }
                 };
             }
 
@@ -371,15 +398,32 @@
                 const id = existingId || 'tab-' + Math.random().toString(36).substr(2, 9);
                 const ifr = document.createElement('iframe');
                 ifr.id = `ifr-${id}`;
-                ifr.src = url;
+                
+                let initialSrc = url;
+                if (scramjet && url !== 'newtab.html' && url !== 'games.html' && url !== 'about:blank') {
+                    initialSrc = scramjet.encodeUrl(url);
+                }
+                
+                ifr.src = initialSrc;
                 ifr.className = 'absolute top-0 left-0 hidden';
                 this.dom.viewport.appendChild(ifr);
 
                 const tabEl = document.createElement('div');
                 tabEl.id = `el-${id}`;
                 tabEl.className = 'tab group';
-                tabEl.innerHTML = `<span class="truncate flex-1 font-bold">${title}</span>`;
+                tabEl.innerHTML = `
+                    <span class="truncate flex-1 font-bold">${title}</span>
+                    <button class="close-tab-btn">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                `;
+                
                 tabEl.onclick = () => this.switchTab(id);
+                const closeBtn = tabEl.querySelector('.close-tab-btn');
+                closeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    this.closeTab(id);
+                };
 
                 this.dom.strip.insertBefore(tabEl, document.getElementById('add-tab-btn'));
                 let dZoom = parseFloat(localStorage.getItem('vision_default_zoom')) || 100;
@@ -387,6 +431,27 @@
 
                 this.tabs.push({ id, url, title, ifr, el: tabEl, zoom: zoom || dZoom });
                 this.switchTab(id);
+            }
+
+            closeTab(id) {
+                if (this.tabs.length <= 1) {
+                    this.navigate('newtab.html');
+                    return;
+                }
+                const idx = this.tabs.findIndex(t => t.id === id);
+                if (idx === -1) return;
+                
+                const tab = this.tabs[idx];
+                tab.el.remove();
+                tab.ifr.remove();
+                this.tabs.splice(idx, 1);
+                
+                if (this.activeTabId === id) {
+                    const nextTab = this.tabs[idx] || this.tabs[idx - 1];
+                    this.switchTab(nextTab.id);
+                } else {
+                    this.saveSession();
+                }
             }
 
             switchTab(id) {
@@ -434,21 +499,35 @@
             navigate(input) {
                 if (!this.activeTabId) return;
                 const active = this.tabs.find(t => t.id === this.activeTabId);
-                let target = input
-                let se = "https://search.brave.com/search?q="
+                if (!active) return;
+                
+                let target = input;
+                let se = localStorage.getItem('vision_search_engine') || "https://www.google.com/search?q=";
 
-                if (!target.includes(".")) {
-                    target = se + encodeURIComponent(target)
+                if (input === 'newtab.html' || input === 'games.html') {
+                    target = input;
+                } else if (!input.includes(".")) {
+                    target = se + encodeURIComponent(input);
                 } else {
-                    if (!target.startsWith("http://") && !target.startsWith("https://")) {
-                        target = "https://" + target
+                    if (!input.startsWith("http://") && !input.startsWith("https://")) {
+                        target = "https://" + input;
                     }
                 }
-                if (active) {
-                    active.url = input;
-                    active.ifr.src = scramjet.encodeUrl(target);
-                    this.switchTab(active.id);
+
+                active.url = input;
+                active.title = input;
+                
+                let finalSrc = target;
+                if (scramjet && target !== 'newtab.html' && target !== 'games.html') {
+                    finalSrc = scramjet.encodeUrl(target);
                 }
+                
+                active.ifr.src = finalSrc;
+                
+                const span = active.el.querySelector('span');
+                if (span) span.textContent = input;
+                
+                this.switchTab(active.id);
             }
 
             reloadActiveTab() {
