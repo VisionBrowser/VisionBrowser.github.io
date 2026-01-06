@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision DevTools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #8b5cf6;
+            --bg-dark: #050506;
+            --surface: #0f0f12;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #e4e4e7;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .code { font-family: 'Fira Code', monospace; }
+
+        .nav-bar {
+            height: 44px;
+            background: #000;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 4px;
+            shrink: 0;
+        }
+
+        .nav-tab {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #71717a;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+        .nav-tab.active { color: #fff; background: rgba(139, 92, 246, 0.15); box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.2); }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .tab-pane { position: absolute; inset: 0; display: none; flex-direction: column; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .tab-pane.active { display: flex; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .terminal { background: var(--bg-dark); flex: 1; padding: 20px; overflow-y: auto; }
+        .log-line { display: flex; gap: 12px; margin-bottom: 4px; font-size: 12px; }
+        .log-ts { color: #52525b; min-width: 65px; }
+
+        /* CORS Generator Styles */
+        .cors-form { padding: 32px; max-width: 800px; margin: 0 auto; width: 100%; }
+        .input-group { margin-bottom: 20px; }
+        .label { display: block; font-size: 10px; font-weight: 900; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+        .input { width: 100%; background: #16161a; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: white; font-size: 13px; outline: none; transition: border-color 0.2s; }
+        .input:focus { border-color: var(--accent); }
+        
+        .json-preview { background: #000; border: 1px solid var(--border); border-radius: 12px; padding: 20px; font-size: 13px; color: #a5b4fc; white-space: pre-wrap; position: relative; }
+        .copy-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-tab active" onclick="showTab('console')">Console</div>
+        <div class="nav-tab" onclick="showTab('cors')">CORS Utility</div>
+        <div class="nav-tab" onclick="showTab('firebase')">Firebase</div>
+    </div>
+
+    <div class="main-content">
+        <!-- Console Tab -->
+        <div id="tab-console" class="tab-pane active code">
+            <div id="term-logs" class="terminal">
+                <div class="log-line"><span class="log-ts">00:00:00</span><span class="text-zinc-500 italic">Vision System v2.6 initialized...</span></div>
+            </div>
+        </div>
+
+        <!-- CORS Utility Tab -->
+        <div id="tab-cors" class="tab-pane bg-[#0a0a0c] overflow-y-auto">
+            <div class="cors-form">
+                <h1 class="text-2xl font-black mb-2">CORS Configuration Generator</h1>
+                <p class="text-zinc-500 text-sm mb-8">Generate a standard <code>cors.json</code> file for your Cloud Storage buckets.</p>
+                
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    <div class="input-group">
+                        <label class="label">Origins (comma separated)</label>
+                        <input type="text" id="cors-origins" class="input" value="*" oninput="updateCorsJson()">
+                    </div>
+                    <div class="input-group">
+                        <label class="label">Max Age (Seconds)</label>
+                        <input type="number" id="cors-age" class="input" value="3600" oninput="updateCorsJson()">
+                    </div>
+                </div>
+
+                <div class="input-group mb-8">
+                    <label class="label">Allowed Methods</label>
+                    <div class="flex flex-wrap gap-3">
+                        {['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'].map(m => (
+                            <label key={m} class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked class="cors-method" value={m} onchange="updateCorsJson()">
+                                <span class="text-xs font-bold">{m}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <label class="label">Generated cors.json</label>
+                    <div id="cors-output" class="json-preview code"></div>
+                    <button class="copy-btn" onclick="copyCors()">Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-firebase" class="tab-pane bg-[#0a0a0c] p-8">
+             <!-- Placeholder for firebase content -->
+             <div class="text-zinc-600 font-bold uppercase tracking-widest text-center mt-20">Firebase Deployment Inspector</div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(name) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelector(`.nav-tab[onclick*="${name}"]`).classList.add('active');
+            document.getElementById(`tab-${name}`).classList.add('active');
+        }
+
+        function updateCorsJson() {
+            const origins = document.getElementById('cors-origins').value.split(',').map(o => o.trim()).filter(o => o);
+            const age = parseInt(document.getElementById('cors-age').value) || 3600;
+            const methods = Array.from(document.querySelectorAll('.cors-method:checked')).map(m => m.value);
+            
+            const config = [
+                {
+                    origin: origins,
+                    method: methods,
+                    responseHeader: ["Content-Type", "Authorization", "X-Requested-With"],
+                    maxAgeSeconds: age
+                }
+            ];
+
+            document.getElementById('cors-output').textContent = JSON.stringify(config, null, 4);
+        }
+
+        function copyCors() {
+            const text = document.getElementById('cors-output').textContent;
+            navigator.clipboard.writeText(text);
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = 'Copy to Clipboard', 2000);
+        }
+
+        updateCorsJson();
+        window.parent.postMessage({ type: 'metadata', title: 'Vision DevTools' }, '*');
+    </script>
+</body>
+</html>
