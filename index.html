@@ -11,12 +11,9 @@
         if ("serviceWorker" in navigator) {
             async function sw() {
                 await navigator.serviceWorker.register("/sj/sw.js").then(() => {
-                    console.log("[VISION BROWSER] Service worker registered.")
                 }).catch(e => {
-                    console.error("[VISION BROWSER] Error registering service worker: " + e)
                 })
             }
-
             sw()
         }
     </script>
@@ -259,19 +256,25 @@
     <div class="viewport" id="viewport"></div>
 
     <script>
-        const connection = new BareMux.BareMuxConnection("/bm/worker.js")
-        const wispUrl = localStorage.getItem("vision_wispUrl") ?? "wss://wisp.rhw.one/"
-        connection.setTransport("/lc/index.mjs", [{ websocket: wispUrl }])
+        let scramjet = null;
+        
+        function initProxy() {
+            if (typeof BareMux !== 'undefined' && typeof $scramjetLoadController !== 'undefined') {
+                const connection = new BareMux.BareMuxConnection("/bm/worker.js")
+                const wispUrl = localStorage.getItem("vision_wispUrl") ?? "wss://wisp.rhw.one/"
+                connection.setTransport("/lc/index.mjs", [{ websocket: wispUrl }])
 
-        const { ScramjetController } = $scramjetLoadController()
-        const scramjet = new ScramjetController({
-            files: {
-                wasm: "/sj/scramjet.wasm",
-                sync: "/sj/scramjet.sync.js",
-                all: "/sj/scramjet.all.js"
+                const { ScramjetController } = $scramjetLoadController()
+                scramjet = new ScramjetController({
+                    files: {
+                        wasm: "/sj/scramjet.wasm",
+                        sync: "/sj/scramjet.sync.js",
+                        all: "/sj/scramjet.all.js"
+                    }
+                })
+                scramjet.init()
             }
-        })
-        scramjet.init()
+        }
 
         const tabsContainer = document.getElementById('tabs-container');
         const viewport = document.getElementById('viewport');
@@ -289,10 +292,8 @@
             const val = input.trim();
             if (!val) return 'newtab.html';
 
-            // Clean input to detect if it's already a full URL or needs a proxy
             let targetUrl = val;
             if (val.startsWith('https://') || val.startsWith('http://')) {
-                // Ensure it's https
                 targetUrl = val.replace(/^http:\/\//, 'https://');
             } else if (val.includes('.') && !val.includes(' ')) {
                 targetUrl = `https://${val}`;
@@ -300,8 +301,10 @@
                 targetUrl = `https://www.google.com/search?q=${encodeURIComponent(val)}`;
             }
 
-            // Always wrap in the embed proxy to avoid fetch errors and iframe restrictions
-            return scramjet.encodeUrl(targetUrl);
+            if (scramjet) {
+                return scramjet.encodeUrl(targetUrl);
+            }
+            return targetUrl;
         }
 
         function getDisplayUrl(url) {
@@ -434,13 +437,20 @@
             }
         });
 
+        initProxy();
         addTab();
 
-        document.getElementById('back').onclick = () => document.getElementById(`iframe-${activeTabId}`).contentWindow.history.back();
-        document.getElementById('forward').onclick = () => document.getElementById(`iframe-${activeTabId}`).contentWindow.history.forward();
+        document.getElementById('back').onclick = () => {
+            const f = document.getElementById(`iframe-${activeTabId}`);
+            if (f && f.contentWindow) f.contentWindow.history.back();
+        };
+        document.getElementById('forward').onclick = () => {
+            const f = document.getElementById(`iframe-${activeTabId}`);
+            if (f && f.contentWindow) f.contentWindow.history.forward();
+        };
         document.getElementById('reload').onclick = () => {
             const f = document.getElementById(`iframe-${activeTabId}`);
-            f.src = f.src;
+            if (f) f.src = f.src;
         };
     </script>
 </body>
