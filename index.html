@@ -1,482 +1,447 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vision Browser</title>
+    <title>Vision v1 | The Original Glass Browser</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/bm/index.js"></script>
-    <script src="/sj/scramjet.all.js"></script>
-    <script>
-        if (window.self !== window.top) {
-            try {
-                if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-                    document.documentElement.innerHTML = '<body style="background:#000;color:#333;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;margin:0;">Refused to nest Vision Browser.</body>';
-                    window.stop();
-                }
-            } catch (e) {}
-        }
-
-        if ("serviceWorker" in navigator) {
-            async function sw() {
-                await navigator.serviceWorker.register("/sj/sw.js").then(() => {
-                }).catch(e => {
-                })
-            }
-            sw()
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0a;
-            --nav-bg: #0f0f0f;
-            --tab-active: #0f0f0f;
-            --text-main: #ffffff;
-            --text-dim: #777777;
-            --border: rgba(255, 255, 255, 0.05);
-            --input-gray: #121212;
-            --accent: #8b5cf6;
+            --bg-main: #000000;
+            --accent: #d1b8ff;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --tab-zoom: 1;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
             margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-main);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            user-select: none;
+            height: 100vh;
+            transition: background 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .tab-strip {
-            display: flex;
-            align-items: flex-end;
-            padding-left: 8px;
-            padding-top: 8px;
-            height: 46px;
-            background: var(--bg);
-            z-index: 30;
+        .glass-dark {
+            background: rgba(10, 10, 12, 0.85);
+            backdrop-filter: blur(50px) saturate(180%);
+            border-bottom: 1px solid var(--border);
         }
 
-        .tabs-container {
-            display: flex;
-            align-items: flex-end;
-            gap: 2px;
+        .glass-tab-strip {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .tab {
-            position: relative;
-            height: 38px;
-            width: 200px;
+            height: 40px;
+            min-width: 160px;
+            max-width: 240px;
             padding: 0 16px;
             display: flex;
             align-items: center;
             font-size: 11px;
-            font-weight: 600;
-            color: var(--text-dim);
+            font-weight: 700;
             cursor: pointer;
-            user-select: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 12px 12px 0 0;
-            background: rgba(255,255,255,0.02);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-top-left-radius: 14px;
+            border-top-right-radius: 14px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-right: 4px;
+            position: relative;
         }
 
         .tab:hover {
-            background: rgba(255,255,255,0.05);
-            color: #eee;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .tab.active {
-            background: var(--tab-active);
-            color: #fff;
+            background: #0a0a0b;
+            color: var(--accent);
+            border-top: 2px solid var(--accent);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
             z-index: 10;
-            box-shadow: 0 -4px 15px rgba(139, 92, 246, 0.1);
         }
 
-        .tab.active .tab-text {
-            font-weight: 900;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            font-size: 10px;
-        }
-
-        .tab.active::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--accent);
-            border-radius: 12px 12px 0 0;
-            box-shadow: 0 0 12px var(--accent);
-        }
-
-        .tab-favicon {
-            width: 16px;
-            height: 16px;
-            margin-right: 10px;
-            border-radius: 4px;
-            flex-shrink: 0;
-            filter: grayscale(0.2);
-        }
-
-        .tab.active .tab-favicon {
-            filter: grayscale(0);
-        }
-
-        .tab-text {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-        }
-
-        .tab-close {
-            margin-left: 8px;
-            width: 18px;
-            height: 18px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: all 0.2s;
-        }
-
-        .tab:hover .tab-close, .tab.active .tab-close { opacity: 0.4; }
-        .tab-close:hover { opacity: 1 !important; background: rgba(255,255,255,0.15); color: #ff4444; }
-
-        .nav-bar {
-            background: var(--nav-bg);
-            height: 52px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-            z-index: 20;
-        }
-
-        .nav-controls {
-            display: flex;
-            gap: 8px;
-            margin-right: 20px;
-        }
-
-        .nav-btn {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            color: #555;
-            transition: all 0.2s;
-        }
-
-        .nav-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
-
-        .address-box {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .address-bar {
-            width: 100%;
+        .tool-btn { 
+            width: 36px;
             height: 36px;
-            background: var(--input-gray);
+            border-radius: 12px; 
+            color: rgba(255, 255, 255, 0.4); 
+            transition: all 0.3s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border: 1px solid transparent;
+        }
+        .tool-btn:hover { 
+            background: rgba(255, 255, 255, 0.08); 
+            color: white; 
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        .tool-btn.active { 
+            color: var(--accent); 
+            background: rgba(139, 92, 246, 0.1); 
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .omnibox {
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 0 44px;
-            font-size: 13px;
-            color: #aaa;
-            outline: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            font-weight: 500;
+            border-radius: 16px;
+            height: 40px;
         }
-
-        .address-bar:focus {
+        .omnibox:focus-within {
             border-color: var(--accent);
-            color: #fff;
-            background: #181818;
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 30px var(--accent-glow);
         }
 
-        .address-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #444;
+        .side-panel {
+            position: fixed;
+            top: 112px;
+            right: 0;
+            bottom: 32px;
+            width: 400px;
+            background: rgba(5, 5, 8, 0.94);
+            backdrop-filter: blur(60px) saturate(200%);
+            border-left: 1px solid var(--border);
+            transform: translateX(100%);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            box-shadow: -40px 0 80px rgba(0,0,0,0.9);
         }
+        .side-panel.open { transform: translateX(0); }
 
-        .viewport {
+        .viewport-wrapper {
             flex: 1;
+            overflow: hidden;
             position: relative;
             background: #000;
         }
 
-        .webview {
-            position: absolute;
-            top: 0;
-            left: 0;
+        iframe {
             width: 100%;
             height: 100%;
             border: none;
-            display: none;
+            transform-origin: top left;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .webview.active { display: block; }
+        #more-menu {
+            position: absolute;
+            top: 104px;
+            right: 16px;
+            width: 240px;
+            background: rgba(12, 12, 14, 0.98);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 1000;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9);
+        }
 
-        #add-tab {
-            width: 32px;
-            height: 32px;
+        .menu-item {
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 4px;
-            margin-left: 12px;
-            color: #444;
-            border-radius: 10px;
-            transition: all 0.2s;
-            background: rgba(255,255,255,0.02);
+            gap: 12px;
         }
-        #add-tab:hover { color: #fff; background: rgba(255,255,255,0.08); transform: rotate(90deg); }
+        .menu-item:hover { background: rgba(255,255,255,0.06); color: white; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .zoom-pill {
+            font-size: 10px;
+            font-weight: 900;
+            background: var(--accent);
+            color: black;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-left: 10px;
+        }
     </style>
 </head>
-<body>
-
-    <div class="tab-strip">
-        <div class="tabs-container" id="tabs-container"></div>
-        <button id="add-tab" title="New Tab">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M12 4v16m8-8H4"/></svg>
+<body class="flex flex-col">
+    <div id="tab-strip" class="glass-tab-strip h-12 flex items-end px-4 gap-0 overflow-x-auto no-scrollbar z-20 pt-2">
+        <button id="add-tab-btn" class="mb-1.5 ml-2 p-1.5 rounded-lg hover:bg-white/10 transition-colors text-zinc-600">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-controls">
-            <button class="nav-btn" id="back" title="Back"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-            <button class="nav-btn" id="forward" title="Forward"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
-            <button class="nav-btn" id="reload" title="Reload"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+    <div class="h-14 px-4 flex items-center gap-4 glass-dark z-20">
+        <div class="flex items-center gap-1">
+            <button class="tool-btn" id="back-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <button class="tool-btn" id="forward-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+            <button id="reload-btn" class="tool-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button>
         </div>
 
-        <div class="address-box">
-            <div class="address-icon">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        <div class="flex-1">
+            <div class="omnibox w-full flex items-center px-5 group">
+                <div id="url-favicon" class="w-4 h-4 mr-4 shrink-0 flex items-center justify-center opacity-70">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <input id="address-input" type="text" placeholder="Search or type URL..." class="bg-transparent border-none outline-none w-full text-[14px] font-semibold text-white placeholder-zinc-700">
+                <div id="current-zoom-label" class="zoom-pill hidden">100%</div>
             </div>
-            <input type="text" id="address-input" class="address-bar" placeholder="Vision Search" autocomplete="off" spellcheck="false">
         </div>
-        <div style="width: 120px;"></div>
+
+        <div class="flex items-center gap-1">
+            <button id="zoom-out-btn" class="tool-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+            <button id="zoom-in-btn" class="tool-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+            <div class="w-[1px] h-6 bg-white/10 mx-2"></div>
+            <button id="games-btn" class="tool-btn" onclick="vision.navigate('games.html')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m5-2h.01m2.99 0h.01"/></svg></button>
+            <button id="music-btn" class="tool-btn side-trigger" data-src="music.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></button>
+            <button id="bookmarks-btn" class="tool-btn side-trigger" data-src="bookmarks.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg></button>
+            <button id="settings-btn" class="tool-btn side-trigger" data-src="settings.html"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1-2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+            <button id="dots-btn" class="tool-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg></button>
+        </div>
     </div>
 
-    <div class="viewport" id="viewport"></div>
+    <div id="viewport-container" class="viewport-wrapper"></div>
 
-    <script>
-        let scramjet = null;
-        
-        function initProxy() {
-            if (typeof BareMux !== 'undefined' && typeof $scramjetLoadController !== 'undefined') {
-                const connection = new BareMux.BareMuxConnection("/bm/worker.js")
-                const wispUrl = localStorage.getItem("vision_wispUrl") ?? "wss://wisp.rhw.one/"
-                connection.setTransport("/lc/index.mjs", [{ websocket: wispUrl }])
+    <div id="more-menu">
+        <div class="menu-item" onclick="vision.addTab()">New Tab</div>
+        <div class="menu-item" onclick="vision.navigate('games.html')">Arcade Mode</div>
+        <div class="menu-item" onclick="vision.setZoom(1)">Reset Zoom</div>
+        <div class="w-full h-[1px] bg-white/5 my-1.5"></div>
+        <div class="menu-item text-red-400" onclick="vision.wipeMemory()">Purge Memory</div>
+    </div>
 
-                const { ScramjetController } = $scramjetLoadController()
-                scramjet = new ScramjetController({
-                    files: {
-                        wasm: "/sj/scramjet.wasm",
-                        sync: "/sj/scramjet.sync.js",
-                        all: "/sj/scramjet.all.js"
-                    }
-                })
-                scramjet.init()
+    <div id="side-panel" class="side-panel flex flex-col">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
+            <span id="side-panel-title" class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">System Utility</span>
+            <button id="close-side-btn" class="text-zinc-600 hover:text-white">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-hidden">
+            <iframe id="side-panel-iframe" class="w-full h-full border-none" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <div class="h-8 bg-black border-t border-white/5 flex items-center justify-between px-6 text-[9px] font-bold uppercase tracking-widest text-zinc-600">
+        <div class="flex items-center gap-5">
+            <div class="status-dot opacity-40"></div>
+            <span>Vision OS v1.6</span>
+            <div id="status-url" class="lowercase opacity-30 italic font-medium tracking-normal">vision://home</div>
+        </div>
+        <div id="status-clock">00:00:00</div>
+    </div>
+
+    <script type="module">
+        class VisionEngine {
+            constructor() {
+                this.tabs = [];
+                this.activeTabId = null;
+                this.dom = {
+                    strip: document.getElementById('tab-strip'),
+                    viewport: document.getElementById('viewport-container'),
+                    address: document.getElementById('address-input'),
+                    statusUrl: document.getElementById('status-url'),
+                    sidePanel: document.getElementById('side-panel'),
+                    sideIframe: document.getElementById('side-panel-iframe'),
+                    sideTitle: document.getElementById('side-panel-title'),
+                    urlFavicon: document.getElementById('url-favicon'),
+                    clock: document.getElementById('status-clock'),
+                    moreMenu: document.getElementById('more-menu'),
+                    zoomLabel: document.getElementById('current-zoom-label')
+                };
+                this.init();
             }
-        }
 
-        const tabsContainer = document.getElementById('tabs-container');
-        const viewport = document.getElementById('viewport');
-        const addressInput = document.getElementById('address-input');
-        const addTabBtn = document.getElementById('add-tab');
-
-        let tabs = [];
-        let activeTabId = null;
-
-        const FAVICON_SERVICE = 'https://www.google.com/s2/favicons?sz=64&domain=';
-
-        function createId() { return Math.random().toString(36).substr(2, 9); }
-
-        function resolveUrl(input) {
-            const val = input.trim();
-            if (!val) return 'newtab.html';
-
-            let targetUrl = val;
-            if (val.startsWith('https://') || val.startsWith('http://')) {
-                targetUrl = val.replace(/^http:\/\//, 'https://');
-            } else if (val.includes('.') && !val.includes(' ')) {
-                targetUrl = `https://${val}`;
-            } else {
-                targetUrl = `https://www.google.com/search?q=${encodeURIComponent(val)}`;
+            init() {
+                this.setupListeners();
+                this.loadAesthetics();
+                this.loadSession();
+                setInterval(() => this.updateClock(), 1000);
+                window.addEventListener('storage', () => this.loadAesthetics());
             }
 
-            if (targetUrl.includes(window.location.host) && !targetUrl.includes('newtab.html')) {
-                return 'newtab.html';
-            }
-
-            if (scramjet) {
-                return scramjet.encodeUrl(targetUrl);
-            }
-            return targetUrl;
-        }
-
-        function getDisplayUrl(url) {
-            if (url === 'newtab.html') return '';
-            let target = url;
-            if (url.includes('url=')) {
-                target = decodeURIComponent(url.split('url=')[1]);
-            }
-            return target.replace(/^https?:\/\//, '');
-        }
-
-        function extractDomain(url) {
-            try {
-                let target = url;
-                if (url.includes('url=')) {
-                    target = decodeURIComponent(url.split('url=')[1]);
-                }
-                if (!target.startsWith('http')) return 'google.com';
-                return new URL(target).hostname;
-            } catch (e) { return 'google.com'; }
-        }
-
-        function addTab(url = 'newtab.html', title = 'New Tab') {
-            const id = createId();
-            const tab = {
-                id, url, title,
-                favicon: url === 'newtab.html' ? FAVICON_SERVICE + 'vision.ai' : FAVICON_SERVICE + extractDomain(url)
-            };
-            tabs.push(tab);
-
-            const iframe = document.createElement('iframe');
-            iframe.id = `iframe-${id}`;
-            iframe.className = 'webview';
-            iframe.src = url;
-            viewport.appendChild(iframe);
-
-            setActiveTab(id);
-        }
-
-        function setActiveTab(id) {
-            activeTabId = id;
-            const currentTab = tabs.find(t => t.id === id);
-            
-            document.querySelectorAll('.webview').forEach(f => f.classList.toggle('active', f.id === `iframe-${id}`));
-            addressInput.value = getDisplayUrl(currentTab.url);
-            
-            renderTabs();
-        }
-
-        function closeTab(id, e) {
-            if (e) e.stopPropagation();
-            if (tabs.length === 1) {
-                const t = tabs[0];
-                t.url = 'newtab.html';
-                t.title = 'New Tab';
-                document.getElementById(`iframe-${t.id}`).src = 'newtab.html';
-                setActiveTab(t.id);
-                return;
-            }
-            const idx = tabs.findIndex(t => t.id === id);
-            tabs = tabs.filter(t => t.id !== id);
-            document.getElementById(`iframe-${id}`).remove();
-
-            if (activeTabId === id) setActiveTab(tabs[idx] ? tabs[idx].id : tabs[idx - 1].id);
-            else renderTabs();
-        }
-
-        function renderTabs() {
-            tabsContainer.innerHTML = '';
-            tabs.forEach(tab => {
-                const el = document.createElement('div');
-                el.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
-                el.onclick = () => setActiveTab(tab.id);
-
-                const icon = document.createElement('img');
-                icon.className = 'tab-favicon';
-                icon.src = tab.favicon;
-                icon.onerror = () => icon.src = FAVICON_SERVICE + 'google.com';
-
-                const text = document.createElement('span');
-                text.className = 'tab-text';
-                text.textContent = tab.title;
-
-                const close = document.createElement('div');
-                close.className = 'tab-close';
-                close.innerHTML = '<svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M6 18L18 6M6 6l12 12"/></svg>';
-                close.onclick = (e) => closeTab(tab.id, e);
-
-                el.appendChild(icon);
-                el.appendChild(text);
-                el.appendChild(close);
-                tabsContainer.appendChild(el);
-            });
-        }
-
-        addressInput.onkeydown = (e) => {
-            if (e.key === 'Enter') {
-                const resolved = resolveUrl(addressInput.value);
-                const currentTab = tabs.find(t => t.id === activeTabId);
-                
-                currentTab.url = resolved;
-                currentTab.title = getDisplayUrl(resolved) || 'Vision';
-                currentTab.favicon = FAVICON_SERVICE + extractDomain(resolved);
-                
-                document.getElementById(`iframe-${activeTabId}`).src = resolved;
-                renderTabs();
-                addressInput.blur();
-            }
-        };
-
-        addTabBtn.onclick = () => addTab();
-
-        window.addEventListener('message', (e) => {
-            if (e.data && e.data.type === 'navigate') {
-                addressInput.value = e.data.query;
-                const ev = new KeyboardEvent('keydown', { key: 'Enter' });
-                addressInput.onkeydown(ev);
-            }
-            if (e.data && e.data.type === 'meta-update') {
-                const t = tabs.find(x => x.id === activeTabId);
-                if (t) {
-                    if (e.data.title) t.title = e.data.title;
-                    if (e.data.url) {
-                        t.url = e.data.url;
-                        addressInput.value = getDisplayUrl(t.url);
-                    }
-                    t.favicon = FAVICON_SERVICE + extractDomain(t.url || '');
-                    renderTabs();
+            loadAesthetics() {
+                const bg = localStorage.getItem('vision_wallpaper');
+                if (bg) document.body.style.backgroundImage = `url(${bg})`;
+                const accent = localStorage.getItem('vision_accent');
+                if (accent) {
+                    document.documentElement.style.setProperty('--accent', accent);
+                    document.documentElement.style.setProperty('--accent-glow', accent + '33');
                 }
             }
-        });
 
-        initProxy();
-        addTab();
+            setupListeners() {
+                document.getElementById('add-tab-btn').onclick = () => this.addTab();
+                document.getElementById('reload-btn').onclick = () => this.reloadActiveTab();
+                document.getElementById('back-btn').onclick = () => this.getActiveTabIfr()?.contentWindow?.history.back();
+                document.getElementById('forward-btn').onclick = () => this.getActiveTabIfr()?.contentWindow?.history.forward();
+                document.getElementById('close-side-btn').onclick = () => this.toggleSidePanel(null, null, false);
+                document.getElementById('dots-btn').onclick = (e) => {
+                    e.stopPropagation();
+                    this.dom.moreMenu.style.display = this.dom.moreMenu.style.display === 'flex' ? 'none' : 'flex';
+                };
+                document.getElementById('zoom-in-btn').onclick = () => this.adjustZoom(0.1);
+                document.getElementById('zoom-out-btn').onclick = () => this.adjustZoom(-0.1);
+                window.onclick = () => this.dom.moreMenu.style.display = 'none';
+                document.querySelectorAll('.side-trigger').forEach(btn => {
+                    btn.onclick = () => this.toggleSidePanel(btn.getAttribute('title') || 'Tool', btn.getAttribute('data-src'));
+                });
+                this.dom.address.onkeydown = (e) => {
+                    if (e.key === 'Enter') this.navigate(this.dom.address.value);
+                };
+                window.onmessage = (e) => {
+                    if (e.data.type === 'navigate') this.navigate(e.data.query);
+                    if (e.data.type === 'update-settings') this.loadAesthetics();
+                };
+            }
 
-        document.getElementById('back').onclick = () => {
-            const f = document.getElementById(`iframe-${activeTabId}`);
-            if (f && f.contentWindow) f.contentWindow.history.back();
-        };
-        document.getElementById('forward').onclick = () => {
-            const f = document.getElementById(`iframe-${activeTabId}`);
-            if (f && f.contentWindow) f.contentWindow.history.forward();
-        };
-        document.getElementById('reload').onclick = () => {
-            const f = document.getElementById(`iframe-${activeTabId}`);
-            if (f) f.src = f.src;
-        };
+            loadSession() {
+                const saved = localStorage.getItem('vision_session_v1');
+                if (saved) {
+                    try {
+                        const session = JSON.parse(saved);
+                        if (session.tabs?.length) {
+                            session.tabs.forEach(t => this.addTab(t.url, t.title, t.id, t.zoom));
+                            this.switchTab(session.activeTabId || session.tabs[0].id);
+                            return;
+                        }
+                    } catch (e) {}
+                }
+                this.addTab();
+            }
+
+            saveSession() {
+                localStorage.setItem('vision_session_v1', JSON.stringify({
+                    tabs: this.tabs.map(t => ({ id: t.id, url: t.url, title: t.title, zoom: t.zoom })),
+                    activeTabId: this.activeTabId
+                }));
+            }
+
+            addTab(url = 'newtab.html', title = 'Home', existingId = null, zoom = null) {
+                const id = existingId || 'tab-' + Math.random().toString(36).substr(2, 9);
+                const ifr = document.createElement('iframe');
+                ifr.id = `ifr-${id}`;
+                ifr.src = url;
+                ifr.className = 'absolute top-0 left-0 hidden';
+                this.dom.viewport.appendChild(ifr);
+
+                const tabEl = document.createElement('div');
+                tabEl.id = `el-${id}`;
+                tabEl.className = 'tab group';
+                tabEl.innerHTML = `<span class="truncate flex-1 font-bold">${title}</span>`;
+                tabEl.onclick = () => this.switchTab(id);
+
+                this.dom.strip.insertBefore(tabEl, document.getElementById('add-tab-btn'));
+                let dZoom = parseFloat(localStorage.getItem('vision_default_zoom')) || 100;
+                if (dZoom > 10) dZoom /= 100;
+
+                this.tabs.push({ id, url, title, ifr, el: tabEl, zoom: zoom || dZoom });
+                this.switchTab(id);
+            }
+
+            switchTab(id) {
+                this.tabs.forEach(t => { t.ifr.classList.add('hidden'); t.el.classList.remove('active'); });
+                const active = this.tabs.find(t => t.id === id);
+                if (active) {
+                    active.ifr.classList.remove('hidden');
+                    active.el.classList.add('active');
+                    this.activeTabId = id;
+                    this.dom.address.value = active.url === 'newtab.html' ? '' : active.url;
+                    this.dom.statusUrl.textContent = active.url;
+                    this.updateZoomUI(active);
+                    this.saveSession();
+                }
+            }
+
+            adjustZoom(delta) {
+                const active = this.tabs.find(t => t.id === this.activeTabId);
+                if (active) {
+                    active.zoom = Math.max(0.3, Math.min(3, active.zoom + delta));
+                    this.updateZoomUI(active);
+                    this.saveSession();
+                }
+            }
+
+            setZoom(val) {
+                const active = this.tabs.find(t => t.id === this.activeTabId);
+                if (active) {
+                    active.zoom = val;
+                    this.updateZoomUI(active);
+                    this.saveSession();
+                }
+            }
+
+            updateZoomUI(tab) {
+                const zoomValue = tab.zoom || 1.0;
+                tab.ifr.style.transform = `scale(${zoomValue})`;
+                tab.ifr.style.width = `${100 / zoomValue}%`;
+                tab.ifr.style.height = `${100 / zoomValue}%`;
+                const perc = Math.round(zoomValue * 100);
+                this.dom.zoomLabel.textContent = `${perc}%`;
+                this.dom.zoomLabel.classList.toggle('hidden', perc === 100);
+            }
+
+            navigate(input) {
+                if (!this.activeTabId) return;
+                const active = this.tabs.find(t => t.id === this.activeTabId);
+                if (active) {
+                    active.url = input;
+                    active.ifr.src = input;
+                    this.switchTab(active.id);
+                }
+            }
+
+            reloadActiveTab() {
+                const active = this.tabs.find(t => t.id === this.activeTabId);
+                if (active) active.ifr.src = active.ifr.src;
+            }
+
+            getActiveTabIfr() {
+                return this.tabs.find(t => t.id === this.activeTabId)?.ifr;
+            }
+
+            toggleSidePanel(title, src, force) {
+                const isOpen = this.dom.sidePanel.classList.contains('open');
+                if (isOpen && force === undefined) return this.dom.sidePanel.classList.remove('open');
+                if (force === false) return this.dom.sidePanel.classList.remove('open');
+                this.dom.sideTitle.textContent = title;
+                this.dom.sideIframe.src = src;
+                this.dom.sidePanel.classList.add('open');
+            }
+
+            wipeMemory() {
+                if(confirm('Wipe all Vision data?')) {
+                    localStorage.clear();
+                    window.location.reload();
+                }
+            }
+
+            updateClock() {
+                this.dom.clock.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            }
+        }
+        window.vision = new VisionEngine();
     </script>
 </body>
 </html>
