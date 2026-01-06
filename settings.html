@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Core Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background: #08080a; 
+            color: #e4e4e7; 
+            font-family: 'Inter', sans-serif; 
+            padding: 1.5rem;
+            user-select: none;
+            scrollbar-width: none;
+        }
+        body::-webkit-scrollbar { display: none; }
+
+        .card { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.07); 
+            border-radius: 20px; 
+            padding: 1.25rem; 
+            margin-bottom: 1.25rem; 
+            transition: border-color 0.3s;
+        }
+        .card:hover { border-color: rgba(255,255,255,0.12); }
+
+        .label { 
+            font-size: 10px; 
+            font-weight: 900; 
+            color: #8b5cf6; 
+            text-transform: uppercase; 
+            letter-spacing: 0.25em; 
+            margin-bottom: 14px; 
+            display: block; 
+            opacity: 0.8;
+        }
+        
+        input, select { 
+            width: 100%; 
+            background: #000; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            padding: 12px 16px; 
+            font-size: 13px; 
+            font-weight: 600;
+            color: white; 
+            outline: none; 
+            transition: all 0.3s ease;
+        }
+        input:focus { border-color: #8b5cf6; background: #0a0a0b; }
+
+        .color-dot { 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            border: 2px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .color-dot:hover { transform: translateY(-4px); scale: 1.1; }
+        .color-dot.active { border-color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .color-dot.active::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: black; font-weight: 900; }
+
+        button.action {
+            width: 100%;
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .hint { font-size: 10px; color: #52525b; font-weight: 600; margin-top: 10px; line-height: 1.5; }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="mb-10 pl-1">
+        <h1 class="section-title italic uppercase tracking-tighter">System_Configuration</h1>
+        <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.3em]">Hardware Abstraction Layer v1.6.2</p>
+    </div>
+
+    <!-- Atmosphere -->
+    <div class="card">
+        <span class="label">Atmosphere (Wallpaper)</span>
+        <input type="text" id="wallpaper-url" placeholder="Direct Image URL (png, jpg, gif)...">
+        <div class="flex gap-2 mt-4">
+            <button class="action bg-white/5 hover:bg-white/10 text-zinc-400" onclick="setWall('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2072')">Void</button>
+            <button class="action bg-white/5 hover:bg-white/10 text-zinc-400" onclick="setWall('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1964')">Flow</button>
+            <button class="action bg-white/5 hover:bg-white/10 text-zinc-400" onclick="setWall('')">Reset</button>
+        </div>
+        <p class="hint">Accepts direct links. High resolution recommended for the original Vision experience.</p>
+    </div>
+
+    <!-- Accent -->
+    <div class="card">
+        <span class="label">Neural Accent Color</span>
+        <div class="flex flex-wrap gap-4 mt-2">
+            <div class="color-dot" style="background: #d1b8ff;" data-color="#d1b8ff"></div>
+            <div class="color-dot" style="background: #fecaca;" data-color="#fecaca"></div>
+            <div class="color-dot" style="background: #a7f3d0;" data-color="#a7f3d0"></div>
+            <div class="color-dot" style="background: #bfdbfe;" data-color="#bfdbfe"></div>
+            <div class="color-dot" style="background: #fde68a;" data-color="#fde68a"></div>
+            <div class="color-dot" style="background: #ffffff;" data-color="#ffffff"></div>
+        </div>
+        <p class="hint">Changes the global primary color and glass glow intensity.</p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="card">
+        <span class="label">Navigation Engine</span>
+        <div class="space-y-4">
+            <div>
+                <span class="text-[10px] uppercase font-black text-zinc-500 mb-2 block">Search Strategy</span>
+                <select id="search-engine">
+                    <option value="https://www.google.com/search?q=">Google (Global)</option>
+                    <option value="https://duckduckgo.com/?q=">DuckDuckGo (Privacy)</option>
+                    <option value="https://www.bing.com/search?q=">Bing (MSFT)</option>
+                </select>
+            </div>
+            <div>
+                <span class="text-[10px] uppercase font-black text-zinc-500 mb-2 block">Default Viewport Zoom</span>
+                <input type="number" id="default-zoom" min="50" max="200" step="10" value="100">
+                <p class="hint">Applied to all new tabs. Current: <span id="zoom-val">100</span>%</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance -->
+    <div class="card">
+        <span class="label">Session Registry (Cleanup)</span>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="clearHistory()" class="action bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20">Wipe History</button>
+            <button onclick="clearBookmarks()" class="action bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20">Flush Bookmarks</button>
+        </div>
+        <button id="hard-reset" class="action bg-red-600/20 text-red-600 hover:bg-red-600 hover:text-white mt-3 font-black border border-red-600/30">Total System Purge</button>
+        <p class="hint text-red-500/60">Warning: Total Purge resets all local data and preferences to factory default.</p>
+    </div>
+
+    <script>
+        const engine = document.getElementById('search-engine');
+        const wallpaper = document.getElementById('wallpaper-url');
+        const zoomInput = document.getElementById('default-zoom');
+        const dots = document.querySelectorAll('.color-dot');
+
+        // Load Persisted State
+        function loadSettings() {
+            engine.value = localStorage.getItem('vision_search_engine') || 'https://www.google.com/search?q=';
+            wallpaper.value = localStorage.getItem('vision_wallpaper') || '';
+            zoomInput.value = localStorage.getItem('vision_default_zoom') || '100';
+            document.getElementById('zoom-val').textContent = zoomInput.value;
+            
+            const currentAccent = localStorage.getItem('vision_accent') || '#d1b8ff';
+            dots.forEach(d => {
+                d.classList.toggle('active', d.dataset.color === currentAccent);
+            });
+        }
+
+        // Event Listeners
+        engine.onchange = () => {
+            localStorage.setItem('vision_search_engine', engine.value);
+            notifyParent();
+        };
+
+        wallpaper.oninput = () => {
+            localStorage.setItem('vision_wallpaper', wallpaper.value);
+            notifyParent();
+        };
+
+        zoomInput.oninput = () => {
+            localStorage.setItem('vision_default_zoom', zoomInput.value);
+            document.getElementById('zoom-val').textContent = zoomInput.value;
+            notifyParent();
+        };
+
+        window.setWall = (url) => {
+            wallpaper.value = url;
+            localStorage.setItem('vision_wallpaper', url);
+            notifyParent();
+        };
+
+        dots.forEach(dot => {
+            dot.onclick = () => {
+                dots.forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+                localStorage.setItem('vision_accent', dot.dataset.color);
+                notifyParent();
+            };
+        });
+
+        function notifyParent() {
+            window.parent.postMessage({type: 'update-settings'}, '*');
+        }
+
+        window.clearHistory = () => {
+            if(confirm('Delete all browsing history?')) {
+                localStorage.setItem('vision_history', '[]');
+                alert('History Registry Flushed.');
+            }
+        };
+
+        window.clearBookmarks = () => {
+            if(confirm('Delete all bookmarks?')) {
+                localStorage.setItem('vision_bookmarks', '[]');
+                alert('Bookmarks Registry Flushed.');
+            }
+        };
+
+        document.getElementById('hard-reset').onclick = () => {
+            if(confirm('TOTAL SYSTEM PURGE: This cannot be undone. Proceed?')) {
+                localStorage.clear();
+                window.parent.location.reload();
+            }
+        };
+
+        loadSettings();
+    </script>
+</body>
+</html>
