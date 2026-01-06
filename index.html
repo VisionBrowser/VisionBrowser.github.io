@@ -5,6 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vision v1 | The Original Glass Browser</title>
+    <script src="/bm/index.js"></script>
+    <script src="/sj/scramjet.all.js"></script>
+    <script>
+        async function sw() {
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("/sj/sw.js").then(() => {
+                    console.log("[VISION] Service worker registered.")
+                }).catch((_) => {
+                    console.error("[VISION] Error registering service worker: " + _)
+                })
+            }
+        }
+
+        sw()
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -253,6 +268,20 @@
     </div>
 
     <script type="module">
+        const connection = new BareMux.BareMuxConnection("/bm/worker.js")
+        connection.setTransport("/lc/index.mjs", [{ websocket: localStorage.getItem("vision_wispUrl") ?? "wss://wisp.rhw.one/" }])
+
+        const { ScramjetController } = $scramjetLoadController()
+
+        const scramjet = new ScramjetController({
+            files: {
+                wasm: "/sj/scramjet.wasm",
+                sync: "/sj/scramjet.sync.js",
+                all: "/sj/scramjet.all.js"
+            }
+        })
+        scramjet.init()
+
         class VisionEngine {
             constructor() {
                 this.tabs = [];
@@ -405,9 +434,19 @@
             navigate(input) {
                 if (!this.activeTabId) return;
                 const active = this.tabs.find(t => t.id === this.activeTabId);
+                let target = input
+                let se = "https://search.brave.com/search?q="
+
+                if (!target.includes(".")) {
+                    target = se + encodeURIComponent(target)
+                } else {
+                    if (!target.startsWith("http://") && !target.startsWith("https://")) {
+                        target = "https://" + target
+                    }
+                }
                 if (active) {
                     active.url = input;
-                    active.ifr.src = input;
+                    active.ifr.src = scramjet.encodeUrl(target);
                     this.switchTab(active.id);
                 }
             }
