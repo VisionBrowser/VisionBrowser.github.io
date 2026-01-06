@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vision Browser</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/bm/index.js"></script>
+    <script src="/sj/scramjet.all.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            async function sw() {
+                await navigator.serviceWorker.register("/sj/sw.js").then(() => {
+                    console.log("[VISION BROWSER] Service worker registered.")
+                }).catch(e => {
+                    console.error("[VISION BROWSER] Error registering service worker: " + e)
+                })
+            }
+
+            sw()
+        }
+    </script>
     <style>
         :root {
             --bg: #0a0a0a;
@@ -244,6 +259,20 @@
     <div class="viewport" id="viewport"></div>
 
     <script>
+        const connection = new BareMux.BareMuxConnection("/bm/worker.js")
+        const wispUrl = localStorage.getItem("vision_wispUrl") ?? "wss://wisp.rhw.one/"
+        connection.setTransport("/lc/index.mjs", [{ websocket: wispUrl }])
+
+        const { ScramjetController } = $scramjetLoadController()
+        const scramjet = new ScramjetController({
+            files: {
+                wasm: "/sj/scramjet.wasm",
+                sync: "/sj/scramjet.sync.js",
+                all: "/sj/scramjet.all.js"
+            }
+        })
+        scramjet.init()
+
         const tabsContainer = document.getElementById('tabs-container');
         const viewport = document.getElementById('viewport');
         const addressInput = document.getElementById('address-input');
@@ -272,7 +301,7 @@
             }
 
             // Always wrap in the embed proxy to avoid fetch errors and iframe restrictions
-            return `/active/embed.html?url=${encodeURIComponent(targetUrl)}`;
+            return scramjet.encodeUrl(targetUrl);
         }
 
         function getDisplayUrl(url) {
